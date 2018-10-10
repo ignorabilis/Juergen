@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    StatusBar,
     CameraRoll,
     Text,
     View,
@@ -98,6 +99,7 @@ export class CameraView extends React.Component {
         } else if (hasCameraPermission && hasCameraRollPermissions) {
             return (
                 <View style={{ flex: 1 }}>
+                    <StatusBar hidden={true} />
                     <Camera
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
