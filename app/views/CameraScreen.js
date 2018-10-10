@@ -20,8 +20,10 @@ export class CameraView extends React.Component {
         cameraRollUri: null,
         hasCameraPermission: null,
         hasCameraRollPermissions: null,
+        //todo - this needs to be properly reset here
         _shotsTaken: 0,
         type: Camera.Constants.Type.back,
+        flashMode: Camera.Constants.FlashMode.off,
     };
 
     _saveToCameraRollAsync = async () => {
@@ -103,7 +105,8 @@ export class CameraView extends React.Component {
                     <Camera
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
-                        type={this.state.type}>
+                        type={this.state.type}
+                        flashMode={this.state.flashMode}>
                         <View
                             style={{
                                 flex: 1,
@@ -112,7 +115,7 @@ export class CameraView extends React.Component {
                             }}>
                             <TouchableOpacity
                                 style={{
-                                    flex: 0.1,
+                                    flex: 1,
                                     alignSelf: 'flex-end',
                                     alignItems: 'center',
                                 }}
@@ -128,10 +131,40 @@ export class CameraView extends React.Component {
                                     {' '}Flip{' '}
                                 </Text>
                             </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{
+                                    flex: 1,
+                                    alignSelf: 'flex-end',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    let flashMode;
+                                    switch (this.state.flashMode) {
+                                        case Camera.Constants.FlashMode.off:
+                                            flashMode = Camera.Constants.FlashMode.auto;
+                                            break;
+
+                                        case Camera.Constants.FlashMode.auto:
+                                            flashMode = Camera.Constants.FlashMode.on;
+                                            break;
+
+                                        case Camera.Constants.FlashMode.on:
+                                            flashMode = Camera.Constants.FlashMode.off;
+                                            break;
+                                    }
+                                    this.setState({
+                                        flashMode: flashMode
+                                    });
+                                }}>
+                                <Text
+                                    style={{ fontSize: 18, marginBottom: 50, color: 'white' }}>
+                                    {` Flash - ${this.state.flashMode} `}
+                                </Text>
+                            </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={{
-                                    flex: 0.5,
+                                    flex: 1,
                                     alignSelf: 'flex-end',
                                     alignItems: 'center',
                                 }}
