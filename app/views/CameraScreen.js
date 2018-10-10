@@ -12,12 +12,15 @@ import {
 } from 'react-native';
 import { Camera, Permissions, Constants, takeSnapshotAsync } from 'expo';
 
+const shotsToTake = 3;
+const shotsInterval = 1000;
 
 export class CameraView extends React.Component {
     state = {
         cameraRollUri: null,
         hasCameraPermission: null,
         hasCameraRollPermissions: null,
+        _shotsTaken: 0,
         type: Camera.Constants.Type.back,
     };
 
@@ -35,20 +38,40 @@ export class CameraView extends React.Component {
     // probably with an alert for the most common one
     // and another one to catch all else
     snap = async () => {
+        console.log(this.state._shotsTaken);
         if (this.camera) {
-            this.camera.takePictureAsync()
-                .then(data => {
-                    CameraRoll.saveToCameraRoll(data.uri, "photo")
-                        .then(data => {
-                            console.log("Saved to camera roll.");
-                        })
-                        .catch(err => {
-                            console.log(`Camera Roll error: ${err}`);
-                        });
-                })
-                .catch(err => {
-                    console.log(`Camera error: ${err}`);
-                });
+            if (this._interval) {
+                clearInterval(this._interval);
+                this._interval = null;
+                console.log('taking shots stopped by user')
+            }
+            else {
+                this._interval = setInterval(() => {
+
+                    if (this.state._shotsTaken === shotsToTake) {
+                        clearInterval(this._interval);
+                        this._interval = null;
+                        console.log('all shots taken')
+                    }
+                    else {
+                        this.setState({ _shotsTaken: this.state._shotsTaken + 1 })
+                        console.log(`taking shot N: ${this.state._shotsTaken}`)
+                        this.camera.takePictureAsync()
+                            .then(data => {
+                                CameraRoll.saveToCameraRoll(data.uri, "photo")
+                                    .then(data => {
+                                        console.log("Saved to camera roll.");
+                                    })
+                                    .catch(err => {
+                                        console.log(`Camera Roll error: ${err}`);
+                                    });
+                            })
+                            .catch(err => {
+                                console.log(`Camera error: ${err}`);
+                            });
+                    }
+                }, shotsInterval)
+            }
         }
     }
 
@@ -59,10 +82,13 @@ export class CameraView extends React.Component {
         this.setState({ hasCameraPermission: camera === 'granted' });
         this.setState({ hasCameraRollPermissions: roll === 'granted' });
 
-
         const { hasCameraPermission,
             hasCameraRollPermissions } = this.state;
         console.log(`camera: ${hasCameraPermission}, roll: ${hasCameraRollPermissions}`)
+    }
+
+    componentWillUnmount() {
+
     }
 
     render() {
