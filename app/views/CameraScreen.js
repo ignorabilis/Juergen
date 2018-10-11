@@ -23,7 +23,7 @@ export class CameraView extends React.Component {
         shotsInterval: 300,
     };
 
-    clearShootingSession = (reason) => {
+    stopShootingSession = (reason) => {
         clearInterval(this._interval);
         this._interval = null;
         this.setState({ shotsTaken: 0 });
@@ -56,7 +56,7 @@ export class CameraView extends React.Component {
     startShootingSession = async () => {
         if (this.camera) {
             if (this._interval) {
-                this.clearShootingSession('user stopped');
+                this.stopShootingSession('user stopped');
             }
             else {
                 // todo - the first shoot is taken very fast,
@@ -66,7 +66,7 @@ export class CameraView extends React.Component {
                 this.shoot();
                 this._interval = setInterval(() => {
                     if (this.state.shotsTaken === this.state.shotsToTake) {
-                        this.clearShootingSession('all shots taken');
+                        this.stopShootingSession('all shots taken');
                     }
                     else {
                         this.shoot();
@@ -90,7 +90,7 @@ export class CameraView extends React.Component {
     }
 
     componentWillUnmount() {
-        // todo - stop shooting on unmount
+        this.stopShootingSession('user navigated away');
     }
 
     render() {
