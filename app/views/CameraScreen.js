@@ -20,7 +20,7 @@ export class CameraView extends React.Component {
         flashMode: Camera.Constants.FlashMode.off,
         shotsTaken: 0,
         shotsToTake: 3,
-        shotsInterval: 1000,
+        shotsInterval: 300,
     };
 
     clearShootingSession = (reason) => {
@@ -37,6 +37,8 @@ export class CameraView extends React.Component {
 
         console.log(`taking shot N: ${taken}; fired at: ${Date.now() / 1000}`);
 
+        // todo - alerts are not the way to go since they can pop up
+        // every x seconds AFTER the shooting session has finished
         this.camera.takePictureAsync()
             .then(async data => {
                 const [_, err] = await to(CameraRoll.saveToCameraRoll(data.uri, "photo"));
