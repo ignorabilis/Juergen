@@ -28,13 +28,30 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'white'
     },
-    
+
     bottomToolbarButtons: {
         flex: 1,
         alignSelf: 'flex-end',
         alignItems: 'center',
         marginBottom: 50,
     },
+
+    outerShutterButton: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderColor: 'white',
+        borderWidth: 2,
+        justifyContent: 'center',
+    },
+    innerShutterButton: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderColor: 'white',
+        borderWidth: 2,
+        alignSelf: 'center',
+    }
 });
 
 class TopToolbar extends React.Component {
@@ -73,9 +90,9 @@ class BottomToolbar extends React.Component {
                 <TouchableOpacity
                     style={styles.bottomToolbarButtons}
                     onPress={this.props.startShootingSession}>
-                    <Text style={styles.topToolbarButtonsText}>
-                        Shoot
-                    </Text>
+                    <View style={styles.outerShutterButton}>
+                        <View style={styles.innerShutterButton}></View>
+                    </View>
                 </TouchableOpacity>
             </View >
         )
