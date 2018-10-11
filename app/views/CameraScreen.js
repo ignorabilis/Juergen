@@ -18,25 +18,31 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flexDirection: 'row',
     },
-
     topToolbarButtons: {
         flex: 1,
         alignSelf: 'flex-start',
         alignItems: 'center',
         marginTop: 30,
     },
-    topToolbarButtonsText: {
-        fontSize: 18,
-        color: 'white'
+
+    shotsView: {
+        flex: 1,
+        backgroundColor: 'transparent',
+    },
+    shotsText: {
+        fontSize: 38,
+        color: 'white',
+        alignSelf: 'flex-end',
+        marginTop: 30,
+        marginRight: 30,
     },
 
-    bottomToolbarButtons: {
+    shutterToolbar: {
         flex: 1,
         alignSelf: 'flex-end',
         alignItems: 'center',
         marginBottom: 50,
     },
-
     outerShutterButton: {
         width: 100,
         height: 100,
@@ -54,6 +60,18 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     }
 });
+
+class Shots extends React.Component {
+    render() {
+        return (
+            <View style={styles.shotsView}>
+                <Text style={styles.shotsText}>
+                    {`${this.props.shotsTaken}/${this.props.shotsToTake}`}
+                </Text>
+            </View>
+        );
+    }
+}
 
 class TopToolbar extends React.Component {
     render() {
@@ -111,7 +129,7 @@ class BottomToolbar extends React.Component {
         return (
             <View style={styles.toolbars}>
                 <TouchableOpacity
-                    style={styles.bottomToolbarButtons}
+                    style={styles.shutterToolbar}
                     onPress={this.props.startShootingSession}>
                     <View style={styles.outerShutterButton}>
                         <View style={styles.innerShutterButton}></View>
@@ -247,15 +265,28 @@ export class CameraView extends React.Component {
                         style={{ flex: 1 }}
                         type={this.state.type}
                         flashMode={this.state.flashMode}>
-                        <TopToolbar
-                            type={this.state.type}
-                            flashMode={this.state.flashMode}
-                            flipCamera={this.flipCamera}
-                            toggleFlashMode={this.toggleFlashMode}>
-                        </TopToolbar>
+                    </Camera>
+                    {/* This below - position: 'absolute' - looks ugly, but is needed:
+                        conditional rendering inside the camera breakes the camera.
+                        The first time TopToolbar changes to Shots the camera turns black
+                        and no photos are taken. This seems no be an issue with the 
+                        Camera component itself. */}
+                    <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                        {this._interval ?
+                            <Shots
+                                shotsTaken={this.state.shotsTaken}
+                                shotsToTake={this.state.shotsToTake}>
+                            </Shots>
+                            :
+                            <TopToolbar
+                                type={this.state.type}
+                                flashMode={this.state.flashMode}
+                                flipCamera={this.flipCamera}
+                                toggleFlashMode={this.toggleFlashMode}>
+                            </TopToolbar>}
                         <BottomToolbar startShootingSession={this.startShootingSession}>
                         </BottomToolbar>
-                    </Camera>
+                    </View>
                 </View>
             );
         } else {
