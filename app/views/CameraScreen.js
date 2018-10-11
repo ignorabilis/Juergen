@@ -59,7 +59,8 @@ export class CameraView extends React.Component {
             else {
                 // todo - the first shoot is taken very fast,
                 // then the rest are taken after 1.5 seconds
-                // consider using setTimeout instead
+                // setTimeout seems to be worse, although this.shoot 
+                // takes less than 2ms to fire; view ## Timing in README for details
                 this.shoot();
                 this._interval = setInterval(() => {
                     if (this.state.shotsTaken === this.state.shotsToTake) {
