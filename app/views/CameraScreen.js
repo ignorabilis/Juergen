@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Camera, Permissions, takeSnapshotAsync } from 'expo';
 import to from '../../utils/to'
+import { MaterialIcons } from '@expo/vector-icons'
 
 const styles = StyleSheet.create({
     toolbars: {
@@ -56,27 +57,49 @@ const styles = StyleSheet.create({
 
 class TopToolbar extends React.Component {
     render() {
+        let flashModeName = 'off';
+        let cameraTypeName = this.props.type === Camera.Constants.Type.back ?
+            'rear' :
+            'front';
+
+        switch (this.props.flashMode) {
+            case Camera.Constants.FlashMode.off:
+                flashModeName = 'off';
+                break;
+
+            case Camera.Constants.FlashMode.auto:
+                flashModeName = 'auto';
+                break;
+
+            case Camera.Constants.FlashMode.on:
+                flashModeName = 'on';
+                break;
+        }
+
         return (
             <View style={styles.toolbars}>
                 <TouchableOpacity
                     style={styles.topToolbarButtons}
                     onPress={this.props.toggleFlashMode}>
-                    <Text style={styles.topToolbarButtonsText}>
-                        {`Flash - ${this.props.flashMode} `}
-                    </Text>
+                    <MaterialIcons
+                        name={`flash-${flashModeName}`}
+                        size={32}
+                        color='white' />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.topToolbarButtons}
                     onPress={this.props.flipCamera}>
-                    <Text style={styles.topToolbarButtonsText}>
-                        Flip
-                    </Text>
+                    <MaterialIcons
+                        name={`camera-${cameraTypeName}`}
+                        size={32}
+                        color='white' />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.topToolbarButtons}>
-                    <Text style={styles.topToolbarButtonsText}>
-                        Timer
-                    </Text>
+                    <MaterialIcons
+                        name='timer'
+                        size={32}
+                        color='white' />
                 </TouchableOpacity>
             </View >
         )
@@ -129,7 +152,7 @@ export class CameraView extends React.Component {
         // every x seconds AFTER the shooting session has finished
         this.camera.takePictureAsync()
             .then(async data => {
-                const [_, err] = await to(CameraRoll.saveToCameraRoll(data.uri, "photo"));
+                const [_, err] = await to(CameraRoll.saveToCameraRoll(data.uri, 'photo'));
                 if (err) {
                     console.log(`Camera Roll error: ${err}`);
                     Alert.alert('Something happened, cannot save to camera roll.');
