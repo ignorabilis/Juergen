@@ -11,6 +11,55 @@ import {
 import { Camera, Permissions, takeSnapshotAsync } from 'expo';
 import to from '../../utils/to'
 
+const styles = StyleSheet.create({
+    topToolbar: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        flexDirection: 'row',
+    },
+    topToolbarButtons: {
+        flex: 1,
+        alignSelf: 'flex-start',
+        alignItems: 'center'
+    },
+    topToolbarButtonsText: {
+        fontSize: 18,
+        marginTop: 30,
+        color: 'white'
+    }
+});
+
+class TopToolbar extends React.Component {
+    render() {
+        return (
+            <View
+                style={styles.topToolbar}>
+                <TouchableOpacity
+                    style={styles.topToolbarButtons}
+                    onPress={this.props.flipCamera}>
+                    <Text style={styles.topToolbarButtonsText}>
+                        Flip
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.topToolbarButtons}
+                    onPress={this.props.toggleFlashMode}>
+                    <Text style={styles.topToolbarButtonsText}>
+                        {`Flash - ${this.props.flashMode} `}
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.topToolbarButtons}
+                    onPress={this.props.startShootingSession}>
+                    <Text style={styles.topToolbarButtonsText}>
+                        Shoot
+                    </Text>
+                </TouchableOpacity>
+            </View >
+        )
+    }
+}
+
 export class CameraView extends React.Component {
     state = {
         cameraRollUri: null,
@@ -19,7 +68,7 @@ export class CameraView extends React.Component {
         type: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
         shotsTaken: 0,
-        shotsToTake: 3,
+        shotsToTake: 7,
         shotsInterval: 300,
     };
 
@@ -76,6 +125,34 @@ export class CameraView extends React.Component {
         }
     }
 
+    flipCamera = () => {
+        this.setState({
+            type: this.state.type === Camera.Constants.Type.back
+                ? Camera.Constants.Type.front
+                : Camera.Constants.Type.back,
+        });
+    }
+
+    toggleFlashMode = () => {
+        let flashMode;
+        switch (this.state.flashMode) {
+            case Camera.Constants.FlashMode.off:
+                flashMode = Camera.Constants.FlashMode.auto;
+                break;
+
+            case Camera.Constants.FlashMode.auto:
+                flashMode = Camera.Constants.FlashMode.on;
+                break;
+
+            case Camera.Constants.FlashMode.on:
+                flashMode = Camera.Constants.FlashMode.off;
+                break;
+        }
+        this.setState({
+            flashMode: flashMode
+        });
+    }
+
     async componentWillMount() {
         // keep Permissions separate, won't work on iOS otherwise
         const { status: camera } = await Permissions.askAsync(Permissions.CAMERA);
@@ -108,74 +185,13 @@ export class CameraView extends React.Component {
                         style={{ flex: 1 }}
                         type={this.state.type}
                         flashMode={this.state.flashMode}>
-                        <View
-                            style={{
-                                flex: 1,
-                                backgroundColor: 'transparent',
-                                flexDirection: 'row',
-                            }}>
-                            <TouchableOpacity
-                                style={{
-                                    flex: 1,
-                                    alignSelf: 'flex-end',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    this.setState({
-                                        type: this.state.type === Camera.Constants.Type.back
-                                            ? Camera.Constants.Type.front
-                                            : Camera.Constants.Type.back,
-                                    });
-                                }}>
-                                <Text
-                                    style={{ fontSize: 18, marginBottom: 50, color: 'white' }}>
-                                    {' '}Flip{' '}
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{
-                                    flex: 1,
-                                    alignSelf: 'flex-end',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    let flashMode;
-                                    switch (this.state.flashMode) {
-                                        case Camera.Constants.FlashMode.off:
-                                            flashMode = Camera.Constants.FlashMode.auto;
-                                            break;
-
-                                        case Camera.Constants.FlashMode.auto:
-                                            flashMode = Camera.Constants.FlashMode.on;
-                                            break;
-
-                                        case Camera.Constants.FlashMode.on:
-                                            flashMode = Camera.Constants.FlashMode.off;
-                                            break;
-                                    }
-                                    this.setState({
-                                        flashMode: flashMode
-                                    });
-                                }}>
-                                <Text
-                                    style={{ fontSize: 18, marginBottom: 50, color: 'white' }}>
-                                    {` Flash - ${this.state.flashMode} `}
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={{
-                                    flex: 1,
-                                    alignSelf: 'flex-end',
-                                    alignItems: 'center',
-                                }}
-                                onPress={this.startShootingSession}>
-                                <Text
-                                    style={{ fontSize: 18, marginBottom: 50, color: 'white' }}>
-                                    {'    '}Snaps{' '}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TopToolbar
+                            type={this.state.type}
+                            flashMode={this.state.flashMode}
+                            flipCamera={this.flipCamera}
+                            toggleFlashMode={this.toggleFlashMode}
+                            startShootingSession={this.startShootingSession}>
+                        </TopToolbar>
                     </Camera>
                 </View>
             );

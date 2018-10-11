@@ -27,6 +27,7 @@ Some info can be found here - https://stackoverflow.com/questions/42100658/accur
 
 ## Performance
 If the camera cannot keep up `takePictureAsync` is simply not invoked - the promise is neither resolved nor rejected.
+Note that an attempt is still made - the flash might be turned on a few more times.
 
 ## Reloading the app
 Note that hot reloading does not work particularly well with the camera - the app does not get reloaded; use live reload instead.
