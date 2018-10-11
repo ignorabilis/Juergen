@@ -12,35 +12,35 @@ import { Camera, Permissions, takeSnapshotAsync } from 'expo';
 import to from '../../utils/to'
 
 const styles = StyleSheet.create({
-    topToolbar: {
+    toolbars: {
         flex: 1,
         backgroundColor: 'transparent',
         flexDirection: 'row',
     },
+
     topToolbarButtons: {
         flex: 1,
         alignSelf: 'flex-start',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 30,
     },
     topToolbarButtonsText: {
         fontSize: 18,
-        marginTop: 30,
         color: 'white'
-    }
+    },
+    
+    bottomToolbarButtons: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        marginBottom: 50,
+    },
 });
 
 class TopToolbar extends React.Component {
     render() {
         return (
-            <View
-                style={styles.topToolbar}>
-                <TouchableOpacity
-                    style={styles.topToolbarButtons}
-                    onPress={this.props.flipCamera}>
-                    <Text style={styles.topToolbarButtonsText}>
-                        Flip
-                    </Text>
-                </TouchableOpacity>
+            <View style={styles.toolbars}>
                 <TouchableOpacity
                     style={styles.topToolbarButtons}
                     onPress={this.props.toggleFlashMode}>
@@ -50,6 +50,28 @@ class TopToolbar extends React.Component {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.topToolbarButtons}
+                    onPress={this.props.flipCamera}>
+                    <Text style={styles.topToolbarButtonsText}>
+                        Flip
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.topToolbarButtons}>
+                    <Text style={styles.topToolbarButtonsText}>
+                        Timer
+                    </Text>
+                </TouchableOpacity>
+            </View >
+        )
+    }
+}
+
+class BottomToolbar extends React.Component {
+    render() {
+        return (
+            <View style={styles.toolbars}>
+                <TouchableOpacity
+                    style={styles.bottomToolbarButtons}
                     onPress={this.props.startShootingSession}>
                     <Text style={styles.topToolbarButtonsText}>
                         Shoot
@@ -189,9 +211,10 @@ export class CameraView extends React.Component {
                             type={this.state.type}
                             flashMode={this.state.flashMode}
                             flipCamera={this.flipCamera}
-                            toggleFlashMode={this.toggleFlashMode}
-                            startShootingSession={this.startShootingSession}>
+                            toggleFlashMode={this.toggleFlashMode}>
                         </TopToolbar>
+                        <BottomToolbar startShootingSession={this.startShootingSession}>
+                        </BottomToolbar>
                     </Camera>
                 </View>
             );
