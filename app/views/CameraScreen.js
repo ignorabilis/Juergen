@@ -75,11 +75,11 @@ class Shots extends React.Component {
 
 class TopToolbar extends React.Component {
     render() {
-        let flashModeName = 'off';
         let cameraTypeName = this.props.type === Camera.Constants.Type.back ?
             'rear' :
             'front';
 
+        let flashModeName = 'off';
         switch (this.props.flashMode) {
             case Camera.Constants.FlashMode.off:
                 flashModeName = 'off';
@@ -188,7 +188,7 @@ export class CameraView extends React.Component {
                 this.stopShootingSession('user stopped');
             }
             else {
-                // todo - the first shoot is taken very fast,
+                // todo - the first shot is taken very fast,
                 // then the rest are taken after 1.5 seconds
                 // setTimeout seems to be worse, although this.shoot 
                 // takes less than 2ms to fire; view ## Timing in README for details
@@ -234,7 +234,7 @@ export class CameraView extends React.Component {
     }
 
     async componentWillMount() {
-        // keep Permissions separate, won't work on iOS otherwise
+        // !iOS - keep Permissions separate, won't work on iOS otherwise
         const { status: camera } = await Permissions.askAsync(Permissions.CAMERA);
         const { status: roll } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
         this.setState({ hasCameraPermission: camera === 'granted' });
@@ -264,12 +264,16 @@ export class CameraView extends React.Component {
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
                         type={this.state.type}
-                        flashMode={this.state.flashMode}>
+                        flashMode={this.state.flashMode}
+                        // The ratio will match the dimensions of the view you place the Camera component in.
+                        // So to set it to the device screen just use 16:9
+                        // !iOS - this setting is ignored, it should work out-of-the-box
+                        ratio={'16:9'}>
                     </Camera>
                     {/* This below - position: 'absolute' - looks ugly, but is needed:
                         conditional rendering inside the camera breakes the camera.
                         The first time TopToolbar changes to Shots the camera turns black
-                        and no photos are taken. This seems no be an issue with the 
+                        and no photos are taken. This seems to be an issue with the 
                         Camera component itself. */}
                     <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
                         {this._interval ?
