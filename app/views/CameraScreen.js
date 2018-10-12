@@ -9,8 +9,14 @@ import {
     Alert
 } from 'react-native';
 import { Camera, Permissions, takeSnapshotAsync } from 'expo';
-import to from '../../utils/to'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons';
+
+import Slider from 'react-native-slider';
+
+import to from '../../utils/to';
+
+import CameraText from '../components/CameraText';
+import CameraHeader from '../components/CameraHeader';
 
 const styles = StyleSheet.create({
     toolbars: {
@@ -28,11 +34,7 @@ const styles = StyleSheet.create({
     shotsView: {
         flex: 1,
         backgroundColor: 'transparent',
-    },
-    shotsText: {
-        fontSize: 38,
-        color: 'white',
-        alignSelf: 'flex-end',
+        alignItems: 'flex-end',
         marginTop: 30,
         marginRight: 30,
     },
@@ -58,22 +60,42 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 2,
         alignSelf: 'center',
+    },
+
+    sliderView: {
+        flex: 1,
+        width: '60%',
+        alignSelf: 'flex-end',
+        marginTop: 0,
+        paddingLeft: 10,
+        paddingRight: 10
     }
 });
+
+const shotsToTake = 5,
+    shotsInterval = 800,
+    shotstInervalMin = 300,
+    shotsInteralMax = 2000,
+    shotsInteralStep = 100;
+
 
 class Shots extends React.Component {
     render() {
         return (
             <View style={styles.shotsView}>
-                <Text style={styles.shotsText}>
+                <CameraHeader>
                     {`${this.props.shotsTaken}/${this.props.shotsToTake}`}
-                </Text>
+                </CameraHeader>
             </View>
         );
     }
 }
 
 class TopToolbar extends React.Component {
+    state = {
+        showSlider: false,
+    };
+
     render() {
         let cameraTypeName = this.props.type === Camera.Constants.Type.back ?
             'rear' :
@@ -96,29 +118,65 @@ class TopToolbar extends React.Component {
 
         return (
             <View style={styles.toolbars}>
-                <TouchableOpacity
-                    style={styles.topToolbarButtons}
-                    onPress={this.props.toggleFlashMode}>
-                    <MaterialIcons
-                        name={`flash-${flashModeName}`}
-                        size={32}
-                        color='white' />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.topToolbarButtons}
-                    onPress={this.props.flipCamera}>
-                    <MaterialIcons
-                        name={`camera-${cameraTypeName}`}
-                        size={32}
-                        color='white' />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.topToolbarButtons}>
-                    <MaterialIcons
-                        name='timer'
-                        size={32}
-                        color='white' />
-                </TouchableOpacity>
+                <View style={{ flex: 1, flexDirection: 'column' }}>
+                    <View
+                        style={{ height: 90 }}>
+                        <View style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            height: 100,
+                        }}>
+                            <TouchableOpacity
+                                style={styles.topToolbarButtons}
+                                onPress={this.props.toggleFlashMode}>
+                                <MaterialIcons
+                                    name={`flash-${flashModeName}`}
+                                    size={32}
+                                    color='white' />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.topToolbarButtons}
+                                onPress={this.props.flipCamera}>
+                                <MaterialIcons
+                                    name={`camera-${cameraTypeName}`}
+                                    size={32}
+                                    color='white' />
+                            </TouchableOpacity>
+                            <View style={styles.topToolbarButtons}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        this.setState((state, props) =>
+                                            ({ showSlider: !state.showSlider }))
+                                    }}>
+                                    <MaterialIcons
+                                        name='timer'
+                                        size={32}
+                                        color='white' />
+                                </TouchableOpacity>
+                                <CameraText style={{
+                                    alignSelf: 'center',
+                                    marginLeft: 5,
+                                }}>
+                                    {`${this.props.shotsInterval / 1000}s`}
+                                </CameraText>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.sliderView}>
+                        {this.state.showSlider ?
+                            (<Slider
+                                minimumValue={shotstInervalMin}
+                                maximumValue={shotsInteralMax}
+                                step={shotsInteralStep}
+                                value={this.props.shotsInterval}
+                                thumbTintColor='#fff'
+                                minimumTrackTintColor='#fff'
+                                maximumTrackTintColor='#ccc'
+                                onValueChange={this.props.setShotsInterval}
+                            />) :
+                            null}
+                    </View>
+                </View>
             </View >
         )
     }
@@ -148,8 +206,8 @@ export class CameraView extends React.Component {
         type: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
         shotsTaken: 0,
-        shotsToTake: 7,
-        shotsInterval: 300,
+        shotsToTake: shotsToTake,
+        shotsInterval: shotsInterval,
     };
 
     stopShootingSession = (reason) => {
@@ -233,6 +291,10 @@ export class CameraView extends React.Component {
         });
     }
 
+    setShotsInterval = (shotsInterval) => {
+        this.setState({ shotsInterval });
+    }
+
     async componentWillMount() {
         // !iOS - keep Permissions separate, won't work on iOS otherwise
         const { status: camera } = await Permissions.askAsync(Permissions.CAMERA);
@@ -285,8 +347,10 @@ export class CameraView extends React.Component {
                             <TopToolbar
                                 type={this.state.type}
                                 flashMode={this.state.flashMode}
+                                shotsInterval={this.state.shotsInterval}
                                 flipCamera={this.flipCamera}
-                                toggleFlashMode={this.toggleFlashMode}>
+                                toggleFlashMode={this.toggleFlashMode}
+                                setShotsInterval={this.setShotsInterval}>
                             </TopToolbar>}
                         <BottomToolbar startShootingSession={this.startShootingSession}>
                         </BottomToolbar>
