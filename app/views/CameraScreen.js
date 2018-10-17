@@ -14,6 +14,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Slider from 'react-native-slider';
 
 import to from '../../utils/to';
+import {
+    shotsToTake,
+    shotsDefaultInterval,
+    shotstInervalMin,
+    shotsIntervalMax,
+    shotsIntervalStep
+} from '../config';
 
 import CameraText from '../components/CameraText';
 import CameraHeader from '../components/CameraHeader';
@@ -71,13 +78,6 @@ const styles = StyleSheet.create({
         paddingRight: 10
     }
 });
-
-const shotsToTake = 5,
-    shotsInterval = 800,
-    shotstInervalMin = 300,
-    shotsInteralMax = 2000,
-    shotsInteralStep = 100;
-
 
 class Shots extends React.Component {
     render() {
@@ -166,8 +166,8 @@ class TopToolbar extends React.Component {
                         {this.state.showSlider ?
                             (<Slider
                                 minimumValue={shotstInervalMin}
-                                maximumValue={shotsInteralMax}
-                                step={shotsInteralStep}
+                                maximumValue={shotsIntervalMax}
+                                step={shotsIntervalStep}
                                 value={this.props.shotsInterval}
                                 thumbTintColor='#fff'
                                 minimumTrackTintColor='#fff'
@@ -193,12 +193,12 @@ class BottomToolbar extends React.Component {
                         <View style={styles.innerShutterButton}></View>
                     </View>
                 </TouchableOpacity>
-            </View >
+            </View>
         )
     }
 }
 
-export class CameraView extends React.Component {
+export default class CameraScreen extends React.Component {
     state = {
         cameraRollUri: null,
         hasCameraPermission: null,
@@ -207,7 +207,7 @@ export class CameraView extends React.Component {
         flashMode: Camera.Constants.FlashMode.off,
         shotsTaken: 0,
         shotsToTake: shotsToTake,
-        shotsInterval: shotsInterval,
+        shotsInterval: shotsDefaultInterval,
     };
 
     stopShootingSession = (reason) => {
