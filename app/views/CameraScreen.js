@@ -13,9 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import Slider from 'react-native-slider';
 
-import to from '../../utils/to';
 import {
-    shotsToTake,
     shotsDefaultInterval,
     shotstInervalMin,
     shotsIntervalMax,
@@ -205,39 +203,30 @@ export default class CameraScreen extends React.Component {
         hasCameraRollPermissions: null,
         type: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
-        shotsTaken: 0,
-        shotsToTake: shotsToTake,
         shotsInterval: shotsDefaultInterval,
     };
 
     stopShootingSession = (reason) => {
         clearInterval(this._interval);
         this._interval = null;
-        this.setState({ shotsTaken: 0 });
 
         console.log(`taking shots stopped for reason: ${reason}`);
     }
 
     shoot = async () => {
-        let taken = this.state.shotsTaken + 1;
-        this.setState({ shotsTaken: taken });
-
-        console.log(`taking shot N: ${taken}; fired at: ${Date.now() / 1000}`);
-
-        // todo - alerts are not the way to go since they can pop up
+        // TODO - alerts are not the way to go since they can pop up
         // every x seconds AFTER the shooting session has finished
         this.camera.takePictureAsync()
             .then(async data => {
-                const [_, err] = await to(CameraRoll.saveToCameraRoll(data.uri, 'photo'));
-                if (err) {
-                    console.log(`Camera Roll error: ${err}`);
-                    Alert.alert('Something happened, cannot save to camera roll.');
-                }
+                this.props.addShotUri(data.uri);
             })
             .catch(err => {
                 console.log(`Camera error: ${err}`);
                 Alert.alert('Something happened, camera cannot take photo.');
             });
+
+        console.log(`took shot N: ${this.props.shotsTaken}; fired at: ${Date.now() / 1000}`);
+        this.props.incShots();
     }
 
     startShootingSession = async () => {
@@ -246,13 +235,17 @@ export default class CameraScreen extends React.Component {
                 this.stopShootingSession('user stopped');
             }
             else {
-                // todo - the first shot is taken very fast,
+                // The timing issue seems to be relevant only for a
+                // presumably cluttered (android) phone; on another device
+                // this works flawlessly
+                //
+                // The first shot is taken very fast,
                 // then the rest are taken after 1.5 seconds
                 // setTimeout seems to be worse, although this.shoot 
                 // takes less than 2ms to fire; view ## Timing in README for details
                 this.shoot();
                 this._interval = setInterval(() => {
-                    if (this.state.shotsTaken === this.state.shotsToTake) {
+                    if (this.props.shotsTaken === this.props.shotsToTake) {
                         this.stopShootingSession('all shots taken');
                     }
                     else {
@@ -340,8 +333,8 @@ export default class CameraScreen extends React.Component {
                     <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
                         {this._interval ?
                             <Shots
-                                shotsTaken={this.state.shotsTaken}
-                                shotsToTake={this.state.shotsToTake}>
+                                shotsTaken={this.props.shotsTaken}
+                                shotsToTake={this.props.shotsToTake}>
                             </Shots>
                             :
                             <TopToolbar

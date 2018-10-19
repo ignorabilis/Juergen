@@ -10,28 +10,29 @@ this messes up the node_modules folder. So use this instead:
     npm i
     expo start
 ```
-
-Another solution would be (if using npm/yarn):
-- Navigate to node_modules > .bin of the codebase
-- Find expo and expo.cmd in that directory
-- Rename it to anything.
-- Start the project normally.
-
 ## Timing
+The timing issue seems to be relevant only for a presumably cluttered (android) phone; 
+on another device this works flawlessly.
 The timing of `setInterval` does not seem to be very good. On my phone `this.shoot` is async and takes less than 2ms to fire.
 Then `setInterval` is invoked, but the first invokation of `this.shoot` happens after ~1.5s + interval;
 each subsequent shot is taken accurately.
-
 The timing of `setTimeout` seems to be even worse, as for each invokation ~1.5s are added.
 Some info can be found here - https://stackoverflow.com/questions/42100658/accuracy-of-settimeout-in-react-native
 
 ## Performance
-If the camera cannot keep up `takePictureAsync` is simply not invoked - the promise is neither resolved nor rejected.
+If the camera cannot keep up `takePictureAsync` is invoked (???), but the promise is neither resolved nor rejected.
 Note that an attempt is still made - the flash might be turned on a few more times.
+`takePictureAsync` won't be resolved/rejected if the `Camera` is unmounted.
+`takePictureAsync` won't be resolved/rejected if the `Camera` is not visible.
+The code tries to ensure that the `Camera` is visible long enough so that all `takePictureAsync` invocations are resolved.
+The `Camera` is delibarately not unmounted to ensure that `takePictureAsync` is resolved/rejected.
+It seems that `takePictureAsync` can be unresolved for a variety of reasons: 
+- https://github.com/react-native-community/react-native-camera/issues/1311
+- https://github.com/react-native-community/react-native-camera/issues/1373
 
 ## Reloading the app
 Note that hot reloading does not work particularly well with the camera - the app does not get reloaded; use live reload instead.
-
+This is one of the cases which the React Native docs mention - https://facebook.github.io/react-native/docs/debugging#automatic-reloading.
 
 ## Networking
 You need to make sure that your phone and dev machine are on the same wifi network.

@@ -15,19 +15,34 @@ import {
 } from 'react-native';
 import ImageSlider from 'react-native-image-slider'
 
-import { shotsToTake } from '../config'
-
-console.disableYellowBox = true;
+import to from '../../utils/to';
 
 const styles = StyleSheet.create({
     contentText: { color: '#fff' },
     topToolbar: {
-        
+        paddingHorizontal: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+    selectionButton: {
+        margin: 3,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        marginRight: 5,
+    },
+    selectionButtonText: {
+        fontSize: 18,
+        color: 'white',
     },
     bottomToolbar: {
         paddingHorizontal: 10,
         justifyContent: 'center',
         alignItems: 'center',
+        flex: 2,
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
@@ -35,19 +50,23 @@ const styles = StyleSheet.create({
     },
     buttonsText: {
         fontSize: 14,
-        color: 'white',
+        color: 'black',
     },
-    button: {
+    imageButton: {
         margin: 3,
-        width: 15,
-        height: 15,
+        width: 20,
+        height: 20,
         opacity: 0.9,
         alignItems: 'center',
         justifyContent: 'center',
+
+        backgroundColor: 'white',
+        marginRight: 5,
+        borderRadius: 10
     },
     buttonSelected: {
         opacity: 1,
-        color: '#CCC',
+        backgroundColor: '#CCC',
     },
     customSlide: {
         alignItems: 'center',
@@ -62,13 +81,24 @@ const styles = StyleSheet.create({
 });
 
 class KeepImageSlider extends React.Component {
-    render() {
-        const { height: deviceHeight } = Dimensions.get('window');
+    keepAll = () => {
+        this.props.shotsUris.map(async (shotUri) => {
+            const [_, err] = await to(CameraRoll.saveToCameraRoll(shotUri, 'photo'));
+            if (err) {
+                console.log(`Camera Roll error: ${err}`);
+                Alert.alert('Something happened, cannot save to camera roll.');
+            }
+        })
 
+        this.props.resetShots();
+    };
+
+    render() {
+        console.log('uris: ' + this.props.shotsUris);
         return (
             <View style={{ flex: 1 }}>
                 <ImageSlider
-                    images={this.props.photoUrls}
+                    images={this.props.shotsUris}
                     customSlide={({ index, item, style, width }) => (
                         // It's important to put style here because it's got offset inside
                         <View
@@ -84,26 +114,50 @@ class KeepImageSlider extends React.Component {
                     )}
                     customButtons={(position, move) => (
                         <View style={[{
-                            height: deviceHeight,
-                            marginTop: -deviceHeight,
+                            height: 130,
+                            marginTop: -130,
                             borderColor: 'red',
                             borderWidth: 2
                         }, styles.buttons]}>
-                            <View style={{flex: 1}}>
-                                <Text>
-                                    MORE
-                                </Text>
+                            <View style={styles.topToolbar}>
+
+                                <TouchableHighlight
+                                    style={[styles.selectionButton]}
+                                    underlayColor="#CCC">
+                                    <Text style={[styles.selectionButtonText]}>
+                                        Keep
+                                    </Text>
+                                </TouchableHighlight>
+
+                                <TouchableHighlight
+                                    style={[styles.selectionButton]}
+                                    underlayColor="#CCC"
+                                    onPress={this.keepAll}>
+                                    <Text style={[styles.selectionButtonText]}>
+                                        Keep All
+                                    </Text>
+                                </TouchableHighlight>
+
+                                <TouchableHighlight
+                                    style={[styles.selectionButton]}
+                                    underlayColor="#CCC"
+                                    onPress={this.props.resetShots}>
+                                    <Text style={[styles.selectionButtonText]}>
+                                        Done
+                                    </Text>
+                                </TouchableHighlight>
                             </View>
-                            <View style={{flex: 1}}>
+                            <View style={styles.bottomToolbar}>
                                 {
-                                    this.props.photoUrls.map((image, index) => {
+                                    this.props.shotsUris.map((image, index) => {
+                                        console.log(image);
                                         return (
                                             <TouchableHighlight
                                                 key={index}
-                                                underlayColor="#ccc"
                                                 onPress={() => move(index)}
-                                                style={styles.button}>
-                                                <Text style={[styles.buttonsText, position === index && styles.buttonSelected]}>
+                                                style={[styles.imageButton, position === index && styles.buttonSelected]}
+                                                underlayColor="#CCC">
+                                                <Text style={[styles.buttonsText]}>
                                                     {index + 1}
                                                 </Text>
                                             </TouchableHighlight>
@@ -119,25 +173,25 @@ class KeepImageSlider extends React.Component {
 }
 
 export default class CameraRollScreen extends React.Component {
-    state = { photoUrls: null };
-
     async componentDidMount() {
-        let photos = await CameraRoll.getPhotos({ first: shotsToTake }),
-            photoUrls = photos.edges.map(({ node: photo }) => {
-                return photo.image.uri;
-            });
-        this.setState({ photoUrls });
+        // Get the images from the memory of the phone, as they come; 
+        // let photos = await CameraRoll.getPhotos({ first: shotsToTake }),
+        //     photoUrls = photos.edges.map(({ node: photo }) => {
+        //         return photo.image.uri;
+        //     });
     }
 
     render() {
-        let { photoUrls } = this.state;
+        let { shotsUris } = this.props;
+        console.log('uot', shotsUris);
         return (
             <View style={{ flex: 1 }}>
                 <StatusBar hidden={true} />
                 {
-                    photoUrls ?
+                    shotsUris ?
                         <KeepImageSlider
-                            photoUrls={photoUrls}></KeepImageSlider> :
+                            shotsUris={shotsUris}
+                            resetShots={this.props.resetShots}></KeepImageSlider> :
                         <Text>Fetching photos...</Text>
                 }
             </View>

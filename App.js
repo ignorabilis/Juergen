@@ -1,22 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import CameraScreen from './app/views/CameraScreen';
-import CameraRollScreen from './app/views/CameraRollScreen';
+import { YellowBox } from 'react-native';
+import FSCamera from './app/views/FSCamera';
+
+// ignore warnings about remote debugger while... developing
+YellowBox.ignoreWarnings(['Remote debugger']);
 
 export default class App extends React.Component {
   render() {
     return (
-      // <CameraScreen></CameraScreen>
-      <CameraRollScreen></CameraRollScreen>
+      <FSCamera></FSCamera>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
