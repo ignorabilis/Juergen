@@ -9,6 +9,7 @@ export default class FSCamera extends React.Component {
   state = {
     shotsTaken: 0,
     shotsToTake: shotsToTake,
+    showCamera: true,
     shotsUris: [],
   };
 
@@ -26,33 +27,37 @@ export default class FSCamera extends React.Component {
     this.setState({ shotsTaken: 0, shotsUris: [] });
   }
 
+  toggleCamera = () => {
+    this.setState({ showCamera: !this.state.showCamera })
+  }
+
   render() {
-    // ~~ is used to convert true/false to 1/0
-    let cameraRollScreen = this.state.shotsTaken === this.state.shotsToTake;
     // Do not unmount the Camera - 
     // takePictureAsync promise will not return anything 
     // (the promise will not be resolved/rejected) if there is no Camera
     return (
       <View style={{ flex: 1 }}>
         <View
+          // ~~ is used to convert true/false to 1/0
           style={{
-            flex: ~~!cameraRollScreen,
-            //opacity: ~~!cameraRollScreen 
+            flex: ~~this.state.showCamera
           }}>
           <CameraScreen
             shotsTaken={this.state.shotsTaken}
             shotsToTake={this.state.shotsToTake}
             incShots={this.incShots}
-            addShotUri={this.addShotUri}></CameraScreen>
+            addShotUri={this.addShotUri}
+            toggleCamera={this.toggleCamera}></CameraScreen>
         </View>
         <View
+          // ~~ is used to convert true/false to 1/0
           style={{
-            flex: ~~cameraRollScreen,
-            //opacity: ~~cameraRollScreen
+            flex: ~~!this.state.showCamera,
           }}>
           <CameraRollScreen
             shotsUris={this.state.shotsUris}
-            resetShots={this.resetShots}></CameraRollScreen>
+            resetShots={this.resetShots}
+            toggleCamera={this.toggleCamera}></CameraRollScreen>
         </View>
       </View>
     );

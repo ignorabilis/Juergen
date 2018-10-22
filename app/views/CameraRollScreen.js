@@ -90,6 +90,7 @@ class KeepImageSlider extends React.Component {
             }
         })
 
+        this.props.toggleCamera();
         this.props.resetShots();
     };
 
@@ -141,9 +142,12 @@ class KeepImageSlider extends React.Component {
                                 <TouchableHighlight
                                     style={[styles.selectionButton]}
                                     underlayColor="#CCC"
-                                    onPress={this.props.resetShots}>
+                                    onPress={() => {
+                                        this.props.toggleCamera();
+                                        this.props.resetShots();
+                                    }}>
                                     <Text style={[styles.selectionButtonText]}>
-                                        Done
+                                        Keep Selected
                                     </Text>
                                 </TouchableHighlight>
                             </View>
@@ -173,25 +177,20 @@ class KeepImageSlider extends React.Component {
 }
 
 export default class CameraRollScreen extends React.Component {
-    async componentDidMount() {
-        // Get the images from the memory of the phone, as they come; 
-        // let photos = await CameraRoll.getPhotos({ first: shotsToTake }),
-        //     photoUrls = photos.edges.map(({ node: photo }) => {
-        //         return photo.image.uri;
-        //     });
-    }
-
     render() {
         let { shotsUris } = this.props;
-        console.log('uot', shotsUris);
         return (
             <View style={{ flex: 1 }}>
                 <StatusBar hidden={true} />
                 {
+                    // TODO - improve this - show fetching photos inside the ImageSlider
+                    // if there are no photos
                     shotsUris ?
                         <KeepImageSlider
                             shotsUris={shotsUris}
-                            resetShots={this.props.resetShots}></KeepImageSlider> :
+                            resetShots={this.props.resetShots}
+                            toggleCamera={this.props.toggleCamera}>
+                        </KeepImageSlider> :
                         <Text>Fetching photos...</Text>
                 }
             </View>
