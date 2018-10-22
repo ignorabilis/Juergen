@@ -13,7 +13,9 @@ import {
     Dimensions,
     Alert
 } from 'react-native';
-import ImageSlider from 'react-native-image-slider'
+import { MaterialIcons } from '@expo/vector-icons';
+
+import ImageSlider from 'react-native-image-slider';
 
 import to from '../../utils/to';
 
@@ -80,39 +82,55 @@ const styles = StyleSheet.create({
     },
 });
 
+async function saveShotToCameraRoll(shotUri) {
+    const [_, err] = await to(CameraRoll.saveToCameraRoll(shotUri, 'photo'));
+    if (err) {
+        console.log(`Camera Roll error: ${err}`);
+        Alert.alert('Something happened, cannot save to camera roll.');
+    }
+}
+
 class KeepImageSlider extends React.Component {
-    keepAll = () => {
-        this.props.shotsUris.map(async (shotUri) => {
-            const [_, err] = await to(CameraRoll.saveToCameraRoll(shotUri, 'photo'));
-            if (err) {
-                console.log(`Camera Roll error: ${err}`);
-                Alert.alert('Something happened, cannot save to camera roll.');
+    keepShots = (keepAll) => {
+        this.props.shotsUris.map(async ({ shotUri, keep }) => {
+            if (keepAll || keep) {
+                saveShotToCameraRoll(shotUri);
             }
-        })
+        });
 
         this.props.toggleCamera();
         this.props.resetShots();
     };
 
     render() {
-        console.log('uris: ' + this.props.shotsUris);
         return (
             <View style={{ flex: 1 }}>
                 <ImageSlider
                     images={this.props.shotsUris}
-                    customSlide={({ index, item, style, width }) => (
-                        // It's important to put style here because it's got offset inside
-                        <View
-                            key={index}
-                            style={[
-                                style,
-                                styles.customSlide,
-                            ]}>
-                            <ImageBackground source={{ uri: item }} style={styles.customImage}>
-                                {/* Any content here */}
-                            </ImageBackground>
-                        </View>
-                    )}
+                    customSlide={({ index, item, style, width }) => {
+                        const { shotUri, keep } = item;
+                        return (
+                            // It's important to put style here because it's got offset inside
+                            <View
+                                key={index}
+                                style={[
+                                    style,
+                                    styles.customSlide,
+                                ]}>
+                                <ImageBackground source={{ uri: shotUri }} style={styles.customImage}>
+                                    <TouchableHighlight
+                                        style={[{ opacity: keep ? 1 : 0.5 }, styles.selectionButton]}
+                                        underlayColor="#CCC"
+                                        onPress={() => { this.props.keepShot(index) }}>
+                                        <MaterialIcons
+                                            name={`save`}
+                                            size={32}
+                                            color='white' />
+                                    </TouchableHighlight>
+                                </ImageBackground>
+                            </View>
+                        )
+                    }}
                     customButtons={(position, move) => (
                         <View style={[{
                             height: 130,
@@ -121,19 +139,10 @@ class KeepImageSlider extends React.Component {
                             borderWidth: 2
                         }, styles.buttons]}>
                             <View style={styles.topToolbar}>
-
-                                <TouchableHighlight
-                                    style={[styles.selectionButton]}
-                                    underlayColor="#CCC">
-                                    <Text style={[styles.selectionButtonText]}>
-                                        Keep
-                                    </Text>
-                                </TouchableHighlight>
-
                                 <TouchableHighlight
                                     style={[styles.selectionButton]}
                                     underlayColor="#CCC"
-                                    onPress={this.keepAll}>
+                                    onPress={this.keepShots.bind(this, true)}>
                                     <Text style={[styles.selectionButtonText]}>
                                         Keep All
                                     </Text>
@@ -142,10 +151,7 @@ class KeepImageSlider extends React.Component {
                                 <TouchableHighlight
                                     style={[styles.selectionButton]}
                                     underlayColor="#CCC"
-                                    onPress={() => {
-                                        this.props.toggleCamera();
-                                        this.props.resetShots();
-                                    }}>
+                                    onPress={this.keepShots.bind(this, false)}>
                                     <Text style={[styles.selectionButtonText]}>
                                         Keep Selected
                                     </Text>
@@ -153,8 +159,7 @@ class KeepImageSlider extends React.Component {
                             </View>
                             <View style={styles.bottomToolbar}>
                                 {
-                                    this.props.shotsUris.map((image, index) => {
-                                        console.log(image);
+                                    this.props.shotsUris.map((item, index) => {
                                         return (
                                             <TouchableHighlight
                                                 key={index}
@@ -189,7 +194,8 @@ export default class CameraRollScreen extends React.Component {
                         <KeepImageSlider
                             shotsUris={shotsUris}
                             resetShots={this.props.resetShots}
-                            toggleCamera={this.props.toggleCamera}>
+                            toggleCamera={this.props.toggleCamera}
+                            keepShot={this.props.keepShot}>
                         </KeepImageSlider> :
                         <Text>Fetching photos...</Text>
                 }

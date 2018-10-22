@@ -19,7 +19,7 @@ export default class FSCamera extends React.Component {
 
   addShotUri = (shotUri) => {
     this.setState({
-      shotsUris: [...this.state.shotsUris, shotUri]
+      shotsUris: [...this.state.shotsUris, { shotUri: shotUri, keep: false }]
     });
   }
 
@@ -28,7 +28,13 @@ export default class FSCamera extends React.Component {
   }
 
   toggleCamera = () => {
-    this.setState({ showCamera: !this.state.showCamera })
+    this.setState({ showCamera: !this.state.showCamera });
+  }
+
+  keepShot = (id) => {
+    let shotsUris = [...this.state.shotsUris];
+    shotsUris[id].keep = !shotsUris[id].keep;
+    this.setState({ shotsUris });
   }
 
   render() {
@@ -57,7 +63,9 @@ export default class FSCamera extends React.Component {
           <CameraRollScreen
             shotsUris={this.state.shotsUris}
             resetShots={this.resetShots}
-            toggleCamera={this.toggleCamera}></CameraRollScreen>
+            toggleCamera={this.toggleCamera}
+            keepShot={this.keepShot}>
+          </CameraRollScreen>
         </View>
       </View>
     );
