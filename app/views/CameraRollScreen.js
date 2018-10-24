@@ -8,12 +8,12 @@ import {
     View,
     ScrollView,
     StyleSheet,
-    TouchableOpacity,
     TouchableHighlight,
+    TouchableWithoutFeedback,
     Dimensions,
     Alert
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ImageSlider from 'react-native-image-slider';
 
@@ -21,26 +21,21 @@ import to from '../../utils/to';
 
 const styles = StyleSheet.create({
     contentText: { color: '#fff' },
-    topToolbar: {
-        paddingHorizontal: 10,
+    saveToolbar: {
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
-    selectionButton: {
-        margin: 3,
+
+    saveButton: {
+        margin: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'transparent',
-        marginRight: 5,
+        marginRight: 24,
     },
-    selectionButtonText: {
-        fontSize: 18,
-        color: 'white',
-    },
-    bottomToolbar: {
+    pagesToolbar: {
         paddingHorizontal: 10,
         justifyContent: 'center',
         alignItems: 'center',
@@ -48,7 +43,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
-    buttons: {
+    topSection: {
+        height: 80,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingHorizontal: 20,
+        backgroundColor: 'rgba(52, 52, 52, 0.6)'
+    },
+    bottomSection: {
+        height: 150,
+        marginTop: -150,
+        backgroundColor: 'rgba(52, 52, 52, 0.6)'
     },
     buttonsText: {
         fontSize: 14,
@@ -118,46 +123,42 @@ class KeepImageSlider extends React.Component {
                                     styles.customSlide,
                                 ]}>
                                 <ImageBackground source={{ uri: shotUri }} style={styles.customImage}>
-                                    <TouchableHighlight
-                                        style={[{ opacity: keep ? 1 : 0.5 }, styles.selectionButton]}
-                                        underlayColor="#CCC"
-                                        onPress={() => { this.props.keepShot(index) }}>
-                                        <MaterialIcons
-                                            name={`save`}
-                                            size={32}
-                                            color='white' />
-                                    </TouchableHighlight>
+                                    <View style={styles.topSection}>
+                                        <TouchableWithoutFeedback
+                                            onPress={() => { this.props.keepShot(index) }}>
+                                            <MaterialCommunityIcons
+                                                name={`checkbox-${keep ? 'marked' : 'blank'}-circle-outline`}
+                                                size={48}
+                                                color='white' />
+                                        </TouchableWithoutFeedback>
+                                    </View>
                                 </ImageBackground>
                             </View>
                         )
                     }}
                     customButtons={(position, move) => (
-                        <View style={[{
-                            height: 130,
-                            marginTop: -130,
-                            borderColor: 'red',
-                            borderWidth: 2
-                        }, styles.buttons]}>
-                            <View style={styles.topToolbar}>
+                        <View style={[styles.bottomSection]}>
+                            <View style={styles.saveToolbar}>
                                 <TouchableHighlight
-                                    style={[styles.selectionButton]}
-                                    underlayColor="#CCC"
-                                    onPress={this.keepShots.bind(this, true)}>
-                                    <Text style={[styles.selectionButtonText]}>
-                                        Keep All
-                                    </Text>
-                                </TouchableHighlight>
-
-                                <TouchableHighlight
-                                    style={[styles.selectionButton]}
+                                    style={[styles.saveButton]}
                                     underlayColor="#CCC"
                                     onPress={this.keepShots.bind(this, false)}>
-                                    <Text style={[styles.selectionButtonText]}>
-                                        Keep Selected
-                                    </Text>
+                                    <MaterialCommunityIcons
+                                        name={`content-save`}
+                                        size={40}
+                                        color='white' />
+                                </TouchableHighlight>
+                                <TouchableHighlight
+                                    style={[styles.saveButton]}
+                                    underlayColor="#CCC"
+                                    onPress={this.keepShots.bind(this, true)}>
+                                    <MaterialCommunityIcons
+                                        name={`content-save-all`}
+                                        size={40}
+                                        color='white' />
                                 </TouchableHighlight>
                             </View>
-                            <View style={styles.bottomToolbar}>
+                            <View style={styles.pagesToolbar}>
                                 {
                                     this.props.shotsUris.map((item, index) => {
                                         return (
