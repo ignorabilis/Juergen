@@ -22,6 +22,7 @@ import {
 
 import CameraText from '../components/CameraText';
 import CameraHeader from '../components/CameraHeader';
+import Loader from '../components/Loader';
 
 const styles = StyleSheet.create({
     toolbars: {
@@ -176,7 +177,7 @@ class TopToolbar extends React.Component {
                     </View>
                 </View>
             </View >
-        )
+        );
     }
 }
 
@@ -192,7 +193,7 @@ class BottomToolbar extends React.Component {
                     </View>
                 </TouchableOpacity>
             </View>
-        )
+        );
     }
 }
 
@@ -206,11 +207,17 @@ export default class CameraScreen extends React.Component {
         shotsInterval: shotsDefaultInterval,
     };
 
+    toggleCamera = () => {
+        this.props.toggleCamera();
+        this.props.setLoading(false);
+    }
+
     stopShootingSession = (reason) => {
         clearInterval(this._interval);
         this._interval = null;
 
-        setTimeout(this.props.toggleCamera, 500);
+        this.props.setLoading(true);
+        setTimeout(this.toggleCamera, 500);
         console.log(`taking shots stopped for reason: ${reason}`);
     }
 
@@ -332,22 +339,29 @@ export default class CameraScreen extends React.Component {
                         and no photos are taken. This seems to be an issue with the 
                         Camera component itself. */}
                     <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
-                        {this._interval ?
-                            <Shots
-                                shotsTaken={this.props.shotsTaken}
-                                shotsToTake={this.props.shotsToTake}>
-                            </Shots>
+                        {this.props.loading
+                            ?
+                            <Loader></Loader>
                             :
-                            <TopToolbar
-                                type={this.state.type}
-                                flashMode={this.state.flashMode}
-                                shotsInterval={this.state.shotsInterval}
-                                flipCamera={this.flipCamera}
-                                toggleFlashMode={this.toggleFlashMode}
-                                setShotsInterval={this.setShotsInterval}>
-                            </TopToolbar>}
-                        <BottomToolbar startShootingSession={this.startShootingSession}>
-                        </BottomToolbar>
+                            <View style={{ flex: 1 }}>
+                                {this._interval
+                                    ?
+                                    <Shots
+                                        shotsTaken={this.props.shotsTaken}
+                                        shotsToTake={this.props.shotsToTake}>
+                                    </Shots>
+                                    :
+                                    <TopToolbar
+                                        type={this.state.type}
+                                        flashMode={this.state.flashMode}
+                                        shotsInterval={this.state.shotsInterval}
+                                        flipCamera={this.flipCamera}
+                                        toggleFlashMode={this.toggleFlashMode}
+                                        setShotsInterval={this.setShotsInterval}>
+                                    </TopToolbar>}
+                                <BottomToolbar startShootingSession={this.startShootingSession}>
+                                </BottomToolbar>
+                            </View>}
                     </View>
                 </View>
             );

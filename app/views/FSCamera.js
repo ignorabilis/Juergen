@@ -11,6 +11,7 @@ export default class FSCamera extends React.Component {
     shotsToTake: shotsToTake,
     showCamera: true,
     shotsUris: [],
+    loading: false,
   };
 
   incShots = () => {
@@ -29,6 +30,10 @@ export default class FSCamera extends React.Component {
 
   toggleCamera = () => {
     this.setState({ showCamera: !this.state.showCamera });
+  }
+
+  setLoading = (loading) => {
+    this.setState({ loading })
   }
 
   keepShot = (id) => {
@@ -51,9 +56,11 @@ export default class FSCamera extends React.Component {
           <CameraScreen
             shotsTaken={this.state.shotsTaken}
             shotsToTake={this.state.shotsToTake}
+            loading={this.state.loading}
             incShots={this.incShots}
             addShotUri={this.addShotUri}
-            toggleCamera={this.toggleCamera}></CameraScreen>
+            toggleCamera={this.toggleCamera}
+            setLoading={this.setLoading}></CameraScreen>
         </View>
         <View
           // ~~ is used to convert true/false to 1/0
