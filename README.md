@@ -19,6 +19,12 @@ each subsequent shot is taken accurately.
 The timing of `setTimeout` seems to be even worse, as for each invokation ~1.5s are added.
 Some info can be found here - https://stackoverflow.com/questions/42100658/accuracy-of-settimeout-in-react-native
 
+## Flash
+`Camera.Constants.FlashMode.on` & `Camera.Constants.FlashMode.auto` are not able to keep up when rapidly taking shots.
+This makes the photos blurry or very differently lit or both. In order to be consistent `Camera.Constants.FlashMode.torch`
+is used instead (only when actually taking shots) - the resulting photos are uniformly lit and do not have inferior
+quality.
+
 ## Performance
 If the camera cannot keep up `takePictureAsync` is invoked (???), but the promise is neither resolved nor rejected.
 Note that an attempt is still made - the flash might be turned on a few more times.

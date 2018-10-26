@@ -100,17 +100,15 @@ class TopToolbar extends React.Component {
             'rear' :
             'front';
 
+        // Camera.Constants.FlashMode.torch is used instead of
+        // Camera.Constants.FlashMode.on - see below for details
         let flashModeName = 'off';
         switch (this.props.flashMode) {
             case Camera.Constants.FlashMode.off:
                 flashModeName = 'off';
                 break;
 
-            case Camera.Constants.FlashMode.auto:
-                flashModeName = 'auto';
-                break;
-
-            case Camera.Constants.FlashMode.on:
+            case Camera.Constants.FlashMode.torch:
                 flashModeName = 'on';
                 break;
         }
@@ -276,14 +274,10 @@ export default class CameraScreen extends React.Component {
         let flashMode;
         switch (this.state.flashMode) {
             case Camera.Constants.FlashMode.off:
-                flashMode = Camera.Constants.FlashMode.auto;
+                flashMode = Camera.Constants.FlashMode.torch;
                 break;
 
-            case Camera.Constants.FlashMode.auto:
-                flashMode = Camera.Constants.FlashMode.on;
-                break;
-
-            case Camera.Constants.FlashMode.on:
+            case Camera.Constants.FlashMode.torch:
                 flashMode = Camera.Constants.FlashMode.off;
                 break;
         }
@@ -327,7 +321,11 @@ export default class CameraScreen extends React.Component {
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
                         type={this.state.type}
-                        flashMode={this.state.flashMode}
+                        // Use Camera.Constants.FlashMode.torch instead of Camera.Constants.FlashMode.auto
+                        // since when taking shots fast the flash cannot keep up;
+                        // while preparing the flash should be turned off;
+                        // once the shooting begins take the real value (which could be torch)
+                        flashMode={this._interval ? this.state.flashMode : Camera.Constants.FlashMode.off}
                         // The ratio will match the dimensions of the view you place the Camera component in.
                         // So to set it to the device screen just use 16:9
                         // !iOS - this setting is ignored, it should work out-of-the-box
