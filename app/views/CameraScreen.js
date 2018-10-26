@@ -6,6 +6,7 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     Alert
 } from 'react-native';
 import { Camera, Permissions, takeSnapshotAsync } from 'expo';
@@ -91,10 +92,6 @@ class Shots extends React.Component {
 }
 
 class TopToolbar extends React.Component {
-    state = {
-        showSlider: false,
-    };
-
     render() {
         let cameraTypeName = this.props.type === Camera.Constants.Type.back ?
             'rear' :
@@ -141,26 +138,23 @@ class TopToolbar extends React.Component {
                             </TouchableOpacity>
                             <View style={styles.topToolbarButtons}>
                                 <TouchableOpacity
-                                    onPress={() => {
-                                        this.setState((state, props) =>
-                                            ({ showSlider: !state.showSlider }))
-                                    }}>
+                                    onPress={() => { this.props.setTimerSliderVisibility() }}>
                                     <MaterialIcons
                                         name='timer'
                                         size={32}
                                         color='white' />
+                                    <CameraText style={{
+                                        alignSelf: 'center',
+                                        marginLeft: 5,
+                                    }}>
+                                        {`${this.props.shotsInterval / 1000}s`}
+                                    </CameraText>
                                 </TouchableOpacity>
-                                <CameraText style={{
-                                    alignSelf: 'center',
-                                    marginLeft: 5,
-                                }}>
-                                    {`${this.props.shotsInterval / 1000}s`}
-                                </CameraText>
                             </View>
                         </View>
                     </View>
                     <View style={styles.sliderView}>
-                        {this.state.showSlider ?
+                        {this.props.timerSliderVisibility ?
                             (<Slider
                                 minimumValue={shotstInervalMin}
                                 maximumValue={shotsIntervalMax}
@@ -203,7 +197,18 @@ export default class CameraScreen extends React.Component {
         type: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
         shotsInterval: shotsDefaultInterval,
+        timerSliderVisibility: false,
     };
+
+    setTimerSliderVisibility = (visibility, a) => {
+        if (visibility === undefined) {
+            this.setState((prevState) =>
+                ({ timerSliderVisibility: !prevState.timerSliderVisibility }));
+        }
+        else {
+            this.setState({ timerSliderVisibility: visibility });
+        }
+    }
 
     toggleCamera = () => {
         this.props.toggleCamera();
@@ -272,16 +277,16 @@ export default class CameraScreen extends React.Component {
 
     toggleFlashMode = () => {
         this.setState((prevState) => {
-        let flashMode;
+            let flashMode;
             switch (prevState.flashMode) {
-            case Camera.Constants.FlashMode.off:
-                flashMode = Camera.Constants.FlashMode.torch;
-                break;
+                case Camera.Constants.FlashMode.off:
+                    flashMode = Camera.Constants.FlashMode.torch;
+                    break;
 
-            case Camera.Constants.FlashMode.torch:
-                flashMode = Camera.Constants.FlashMode.off;
-                break;
-        }
+                case Camera.Constants.FlashMode.torch:
+                    flashMode = Camera.Constants.FlashMode.off;
+                    break;
+            }
 
             return { flashMode: flashMode };
         });
@@ -337,31 +342,43 @@ export default class CameraScreen extends React.Component {
                         The first time TopToolbar changes to Shots the camera turns black
                         and no photos are taken. This seems to be an issue with the 
                         Camera component itself. */}
-                    <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
-                        {this.props.loading
-                            ?
-                            <Loader></Loader>
-                            :
-                            <View style={{ flex: 1 }}>
-                                {this._interval
-                                    ?
-                                    <Shots
-                                        shotsTaken={this.props.shotsTaken}
-                                        shotsToTake={this.props.shotsToTake}>
-                                    </Shots>
-                                    :
-                                    <TopToolbar
-                                        type={this.state.type}
-                                        flashMode={this.state.flashMode}
-                                        shotsInterval={this.state.shotsInterval}
-                                        flipCamera={this.flipCamera}
-                                        toggleFlashMode={this.toggleFlashMode}
-                                        setShotsInterval={this.setShotsInterval}>
-                                    </TopToolbar>}
-                                <BottomToolbar startShootingSession={this.startShootingSession}>
-                                </BottomToolbar>
-                            </View>}
-                    </View>
+                    <TouchableWithoutFeedback
+                        onPress={() => {
+                            this.setTimerSliderVisibility(false);
+                        }}>
+                        <View
+                            style={{
+                                position: 'absolute',
+                                top: 0, bottom: 0,
+                                left: 0, right: 0
+                            }}>
+                            {this.props.loading
+                                ?
+                                <Loader></Loader>
+                                :
+                                <View style={{ flex: 1 }}>
+                                    {this._interval
+                                        ?
+                                        <Shots
+                                            shotsTaken={this.props.shotsTaken}
+                                            shotsToTake={this.props.shotsToTake}>
+                                        </Shots>
+                                        :
+                                        <TopToolbar
+                                            type={this.state.type}
+                                            flashMode={this.state.flashMode}
+                                            shotsInterval={this.state.shotsInterval}
+                                            timerSliderVisibility={this.state.timerSliderVisibility}
+                                            flipCamera={this.flipCamera}
+                                            toggleFlashMode={this.toggleFlashMode}
+                                            setShotsInterval={this.setShotsInterval}
+                                            setTimerSliderVisibility={this.setTimerSliderVisibility}>
+                                        </TopToolbar>}
+                                    <BottomToolbar startShootingSession={this.startShootingSession}>
+                                    </BottomToolbar>
+                                </View>}
+                        </View>
+                    </TouchableWithoutFeedback>
                 </View>
             );
         } else {
