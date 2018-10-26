@@ -263,16 +263,17 @@ export default class CameraScreen extends React.Component {
     }
 
     flipCamera = () => {
-        this.setState({
-            type: this.state.type === Camera.Constants.Type.back
+        this.setState((prevState) => ({
+            type: prevState.type === Camera.Constants.Type.back
                 ? Camera.Constants.Type.front
                 : Camera.Constants.Type.back,
-        });
+        }));
     }
 
     toggleFlashMode = () => {
+        this.setState((prevState) => {
         let flashMode;
-        switch (this.state.flashMode) {
+            switch (prevState.flashMode) {
             case Camera.Constants.FlashMode.off:
                 flashMode = Camera.Constants.FlashMode.torch;
                 break;
@@ -281,8 +282,8 @@ export default class CameraScreen extends React.Component {
                 flashMode = Camera.Constants.FlashMode.off;
                 break;
         }
-        this.setState({
-            flashMode: flashMode
+
+            return { flashMode: flashMode };
         });
     }
 
