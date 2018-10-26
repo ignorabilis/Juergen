@@ -122,7 +122,10 @@ class KeepImageSlider extends React.Component {
                                     style,
                                     styles.customSlide,
                                 ]}>
-                                <ImageBackground source={{ uri: shotUri }} style={styles.customImage}>
+                                <ImageBackground
+                                    source={{ uri: shotUri }}
+                                    style={styles.customImage}
+                                    resizeMode='contain'>
                                     <View style={styles.topSection}>
                                         <TouchableWithoutFeedback
                                             onPress={() => { this.props.keepShot(index) }}>
