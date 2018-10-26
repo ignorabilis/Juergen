@@ -96,6 +96,11 @@ async function saveShotToCameraRoll(shotUri) {
 }
 
 class KeepImageSlider extends React.Component {
+    resetCamera = () => {
+        this.props.toggleCamera();
+        this.props.resetShots();
+    }
+
     keepShots = (keepAll) => {
         this.props.shotsUris.map(async ({ shotUri, keep }) => {
             if (keepAll || keep) {
@@ -103,8 +108,7 @@ class KeepImageSlider extends React.Component {
             }
         });
 
-        this.props.toggleCamera();
-        this.props.resetShots();
+        this.resetCamera();
     };
 
     render() {
@@ -157,6 +161,15 @@ class KeepImageSlider extends React.Component {
                                     onPress={this.keepShots.bind(this, true)}>
                                     <MaterialCommunityIcons
                                         name={`content-save-all`}
+                                        size={40}
+                                        color='white' />
+                                </TouchableHighlight>
+                                <TouchableHighlight
+                                    style={[styles.saveButton]}
+                                    underlayColor="#CCC"
+                                    onPress={this.resetCamera}>
+                                    <MaterialCommunityIcons
+                                        name={`cancel`}
                                         size={40}
                                         color='white' />
                                 </TouchableHighlight>
