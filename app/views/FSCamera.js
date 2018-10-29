@@ -5,6 +5,8 @@ import { shotsToTake } from '../config';
 import CameraScreen from './CameraScreen';
 import CameraRollScreen from './CameraRollScreen';
 
+import * as alerts from '../helpers/Alerts';
+
 export default class FSCamera extends React.Component {
   state = {
     shotsTaken: 0,
@@ -43,13 +45,16 @@ export default class FSCamera extends React.Component {
   }
 
   handleBackPress = () => {
-    console.log(this.props.showCamera);
     if (this.state.showCamera) {
       BackHandler.exitApp();
     }
     else {
-      this.resetShots();
-      this.toggleCamera();
+      alerts.areYouSure(
+        'If you continue the whole session will be lost.',
+        () => {
+          this.resetShots();
+          this.toggleCamera();
+        })
 
       return true;
     }

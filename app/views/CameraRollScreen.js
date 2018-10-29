@@ -17,6 +17,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ImageSlider from 'react-native-image-slider';
 
+import * as alerts from '../helpers/Alerts';
 import to from '../../utils/to';
 
 const styles = StyleSheet.create({
@@ -101,14 +102,32 @@ class KeepImageSlider extends React.Component {
         this.props.resetShots();
     }
 
-    keepShots = (keepAll) => {
-        this.props.shotsUris.map(async ({ shotUri, keep }) => {
-            if (keepAll || keep) {
-                saveShotToCameraRoll(shotUri);
-            }
-        });
+    cancelShots = () => {
+        alerts.areYouSure(
+            'If you continue the whole session will be lost.',
+            this.resetCamera)
+    }
 
-        this.resetCamera();
+    keepShots = (keepAll) => {
+        let selectedShots = this.props.shotsUris.filter(({ _, keep }) => keep),
+            saveShot = async ({ shotUri, _ }) => {
+                saveShotToCameraRoll(shotUri);
+            };
+
+        if (keepAll) {
+            alerts.areYouSure(
+                'All photos will be saved.',
+                () => { this.props.shotsUris.map(saveShot); this.resetCamera(); })
+        }
+        else if (!keepAll && selectedShots.length === 0) {
+            alerts.areYouSure(
+                'No photos were selected. If you continue the whole session will be lost.',
+                this.resetCamera)
+        }
+        else {
+            selectedShots.map(saveShot);
+            this.resetCamera();
+        }
     };
 
     render() {
@@ -167,7 +186,7 @@ class KeepImageSlider extends React.Component {
                                 <TouchableHighlight
                                     style={[styles.saveButton]}
                                     underlayColor="#CCC"
-                                    onPress={this.resetCamera}>
+                                    onPress={this.cancelShots}>
                                     <MaterialCommunityIcons
                                         name={`cancel`}
                                         size={40}
