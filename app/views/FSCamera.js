@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, BackHandler } from 'react-native';
 import { shotsToTake } from '../config';
 
 import CameraScreen from './CameraScreen';
@@ -40,6 +40,27 @@ export default class FSCamera extends React.Component {
     let shotsUris = [...this.state.shotsUris];
     shotsUris[id].keep = !shotsUris[id].keep;
     this.setState({ shotsUris });
+  }
+
+  handleBackPress = () => {
+    console.log(this.props.showCamera);
+    if (this.state.showCamera) {
+      BackHandler.exitApp();
+    }
+    else {
+      this.resetShots();
+      this.toggleCamera();
+
+      return true;
+    }
+  }
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress)
   }
 
   render() {

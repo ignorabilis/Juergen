@@ -7,7 +7,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    Alert
+    Alert,
+    BackHandler
 } from 'react-native';
 import { Camera, Permissions, takeSnapshotAsync } from 'expo';
 import { MaterialIcons } from '@expo/vector-icons';

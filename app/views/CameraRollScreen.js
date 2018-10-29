@@ -11,8 +11,7 @@ import {
     TouchableHighlight,
     TouchableWithoutFeedback,
     Dimensions,
-    Alert,
-    BackHandler
+    Alert
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -200,21 +199,6 @@ class KeepImageSlider extends React.Component {
 }
 
 export default class CameraRollScreen extends React.Component {
-    handleBackPress = () => {
-        this.props.resetShots();
-        this.props.toggleCamera();
-
-        return true;
-    }
-
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-    }
-
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress)
-    }
-
     render() {
         let { shotsUris } = this.props;
         return (
