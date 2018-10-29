@@ -4,13 +4,21 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import CameraText from '../components/CameraText';
 
+import * as math from '../../utils/math'
+
+const randLoadingHeaders = ['Here they come!',
+    'Excited?',
+    'Some magic coming!',
+    'Cool!',
+    'Got them. What\'s next?'];
+
 export default class Loader extends React.Component {
     spinValue = new Animated.Value(0);
     spin = this.spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     });
-    
+
     componentDidMount() {
         Animated.loop(
             Animated.timing(
@@ -38,7 +46,7 @@ export default class Loader extends React.Component {
                         size={48}
                         color='white' />
                 </Animated.View>
-                <CameraText>Loading...</CameraText>
+                <CameraText>{randLoadingHeaders[math.randInt(0, randLoadingHeaders.length - 1)]}</CameraText>
             </View>
         );
     }
