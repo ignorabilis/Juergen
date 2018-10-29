@@ -11,9 +11,9 @@
     ],
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/camera-icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/camera.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
