@@ -100,7 +100,7 @@ class Shots extends React.Component {
 
 class TopToolbar extends React.Component {
     render() {
-        let cameraTypeName = this.props.type === Camera.Constants.Type.back ?
+        let cameraTypeName = this.props.cameraType === Camera.Constants.Type.back ?
             'rear' :
             'front';
 
@@ -235,26 +235,26 @@ export default class CameraScreen extends React.Component {
         cameraRollUri: null,
         hasCameraPermission: null,
         hasCameraRollPermissions: null,
-        type: Camera.Constants.Type.back,
+        cameraType: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
         shotsInterval: shotsIntervalDefault,
         settingsSliderVisibility: false,
         settingsSliderType: SettingsSliderTypes.timer
     };
 
-    setSettingsSliderState = (visibility, type, a) => {
+    setSettingsSliderState = (visibility, sliderType) => {
         if (visibility === undefined) {
             // note that short-circuiting with `<expression> && { prop: val }`
             // does not work in react native - the result MUST be an object,
             // otherwise exception is thrown
             this.setState((prevState) => ({
-                ...((type === prevState.settingsSliderType
-                    || (type != prevState.settingsSliderType && !prevState.settingsSliderVisibility)) ?
+                ...((sliderType === prevState.settingsSliderType
+                    || (sliderType != prevState.settingsSliderType && !prevState.settingsSliderVisibility)) ?
                     { settingsSliderVisibility: !prevState.settingsSliderVisibility }
                     :
                     {}),
-                ...(type ?
-                    { settingsSliderType: type }
+                ...(sliderType ?
+                    { settingsSliderType: sliderType }
                     :
                     {})
             }));
@@ -262,8 +262,8 @@ export default class CameraScreen extends React.Component {
         else {
             this.setState({
                 settingsSliderVisibility: visibility,
-                ...(type ?
-                    { settingsSliderType: type }
+                ...(sliderType ?
+                    { settingsSliderType: sliderType }
                     :
                     {})
             });
@@ -329,14 +329,14 @@ export default class CameraScreen extends React.Component {
 
     flipCamera = () => {
         this.setState((prevState) => {
-            const type =
-                prevState.type === Camera.Constants.Type.back ?
+            const cameraType =
+                prevState.cameraType === Camera.Constants.Type.back ?
                     Camera.Constants.Type.front
                     :
                     Camera.Constants.Type.back
 
-            setItem(UserSettings.cameraType, type);
-            return { type };
+            setItem(UserSettings.cameraType, cameraType);
+            return { cameraType };
         });
     }
 
@@ -377,12 +377,12 @@ export default class CameraScreen extends React.Component {
     }
 
     async componentDidMount() {
-        const type = await getItem(UserSettings.cameraType);
+        const cameraType = await getItem(UserSettings.cameraType);
         const flashMode = await getItem(UserSettings.flashMode);
         const shotsInterval = await getItem(UserSettings.shotsInerval);
 
         this.setState({
-            ...(type != null ? { type } : {}),
+            ...(cameraType != null ? { cameraType } : {}),
             ...(flashMode != null ? { flashMode } : {}),
             ...(shotsInterval != null ? { shotsInterval } : {})
         });
@@ -405,7 +405,7 @@ export default class CameraScreen extends React.Component {
                     <Camera
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
-                        type={this.state.type}
+                        type={this.state.cameraType}
                         // Use Camera.Constants.FlashMode.torch instead of Camera.Constants.FlashMode.auto
                         // since when taking shots fast the flash cannot keep up;
                         // while preparing the flash should be turned off;
@@ -444,7 +444,7 @@ export default class CameraScreen extends React.Component {
                                         </Shots>
                                         :
                                         <TopToolbar
-                                            type={this.state.type}
+                                            cameraType={this.state.cameraType}
                                             flashMode={this.state.flashMode}
                                             shotsInterval={this.state.shotsInterval}
                                             shotsToTake={this.props.shotsToTake}
