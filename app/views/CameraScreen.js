@@ -1,16 +1,14 @@
 import React from 'react';
 import {
     StatusBar,
-    CameraRoll,
     Text,
     View,
     StyleSheet,
     TouchableOpacity,
     TouchableWithoutFeedback,
     Alert,
-    BackHandler
 } from 'react-native';
-import { Camera, Permissions, takeSnapshotAsync } from 'expo';
+import { Camera, Permissions } from 'expo';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import Slider from 'react-native-slider';
@@ -26,6 +24,7 @@ import {
     shotsToTakeMax,
     shotsToTakeStep
 } from '../config';
+import { getItem, setItem } from '../helpers/Storage'
 
 import CameraText from '../components/CameraText';
 import CameraHeaderText from '../components/CameraHeaderText';
@@ -326,11 +325,16 @@ export default class CameraScreen extends React.Component {
     }
 
     flipCamera = () => {
-        this.setState((prevState) => ({
-            type: prevState.type === Camera.Constants.Type.back
-                ? Camera.Constants.Type.front
-                : Camera.Constants.Type.back,
-        }));
+        this.setState((prevState) => {
+            const type =
+                prevState.type === Camera.Constants.Type.back ?
+                    Camera.Constants.Type.front
+                    :
+                    Camera.Constants.Type.back
+
+            setItem('cameraType', type);
+            return { type };
+        });
     }
 
     toggleFlashMode = () => {
@@ -346,11 +350,13 @@ export default class CameraScreen extends React.Component {
                     break;
             }
 
-            return { flashMode: flashMode };
+            setItem('flashMode', flashMode);
+            return { flashMode };
         });
     }
 
     setShotsInterval = (shotsInterval) => {
+        setItem('shotsInterval', shotsInterval);
         this.setState({ shotsInterval });
     }
 
@@ -365,6 +371,18 @@ export default class CameraScreen extends React.Component {
             hasCameraRollPermissions } = this.state;
 
         console.log(`camera: ${hasCameraPermission}, roll: ${hasCameraRollPermissions}`);
+    }
+
+    async componentDidMount() {
+        const type = await getItem('cameraType');
+        const flashMode = await getItem('flashMode');
+        const shotsInterval = await getItem('shotsInterval');
+
+        this.setState({
+            ...(type != null ? { type } : {}),
+            ...(flashMode != null ? { flashMode } : {}),
+            ...(shotsInterval != null ? { shotsInterval } : {})
+        });
     }
 
     componentWillUnmount() {

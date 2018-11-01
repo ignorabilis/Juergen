@@ -6,6 +6,7 @@ import CameraScreen from './CameraScreen';
 import CameraRollScreen from './CameraRollScreen';
 
 import * as alerts from '../helpers/Alerts';
+import { getItem, setItem } from '../helpers/Storage'
 
 export default class FSCamera extends React.Component {
   state = {
@@ -16,7 +17,8 @@ export default class FSCamera extends React.Component {
     loading: false,
   };
 
-  setShotsToTake = (shotsToTake) => {
+  setShotsToTake = async (shotsToTake) => {
+    setItem('shotsToTake', shotsToTake);
     this.setState({ shotsToTake: shotsToTake })
   }
 
@@ -64,8 +66,14 @@ export default class FSCamera extends React.Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+
+    const shotsToTake = await getItem('shotsToTake');
+
+    this.setState({
+      ...(shotsToTake != null ? { shotsToTake } : {})
+    });
   }
 
   componentWillUnmount() {
