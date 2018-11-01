@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, BackHandler } from 'react-native';
-import { shotsToTake } from '../config';
+import { shotsToTakeDefault } from '../config';
 
 import CameraScreen from './CameraScreen';
 import CameraRollScreen from './CameraRollScreen';
@@ -10,11 +10,15 @@ import * as alerts from '../helpers/Alerts';
 export default class FSCamera extends React.Component {
   state = {
     shotsTaken: 0,
-    shotsToTake: shotsToTake,
+    shotsToTake: shotsToTakeDefault,
     showCamera: true,
     shotsUris: [],
     loading: false,
   };
+
+  setShotsToTake = (shotsToTake) => {
+    this.setState({ shotsToTake: shotsToTake })
+  }
 
   incShots = () => {
     this.setState({ shotsTaken: this.state.shotsTaken + 1 });
@@ -83,6 +87,7 @@ export default class FSCamera extends React.Component {
             shotsTaken={this.state.shotsTaken}
             shotsToTake={this.state.shotsToTake}
             loading={this.state.loading}
+            setShotsToTake={this.setShotsToTake}
             incShots={this.incShots}
             addShotUri={this.addShotUri}
             toggleCamera={this.toggleCamera}

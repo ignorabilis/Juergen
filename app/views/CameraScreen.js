@@ -16,10 +16,15 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Slider from 'react-native-slider';
 
 import {
-    shotsDefaultInterval,
-    shotstInervalMin,
+    shotsIntervalDefault,
+    shotsInervalMin,
     shotsIntervalMax,
-    shotsIntervalStep
+    shotsIntervalStep,
+
+    shotsToTakeDefault,
+    shotsToTakeMin,
+    shotsToTakeMax,
+    shotsToTakeStep
 } from '../config';
 
 import CameraText from '../components/CameraText';
@@ -111,6 +116,29 @@ class TopToolbar extends React.Component {
                 break;
         }
 
+        let sliderProps;
+        switch (this.props.settingsSliderType) {
+            case 'timer':
+                sliderProps = {
+                    minimumValue: shotsInervalMin,
+                    maximumValue: shotsIntervalMax,
+                    step: shotsIntervalStep,
+                    value: this.props.shotsInterval,
+                    onValueChange: this.props.setShotsInterval
+                };
+                break;
+
+            case 'photos':
+                sliderProps = {
+                    minimumValue: shotsToTakeMin,
+                    maximumValue: shotsToTakeMax,
+                    step: shotsToTakeStep,
+                    value: this.props.shotsToTake,
+                    onValueChange: this.props.setShotsToTake
+                };
+                break;
+        }
+
         return (
             <View style={styles.toolbars}>
                 <View style={{ flex: 1, flexDirection: 'column' }}>
@@ -139,7 +167,7 @@ class TopToolbar extends React.Component {
                             </TouchableOpacity>
                             <View style={styles.topToolbarButtons}>
                                 <TouchableOpacity
-                                    onPress={() => { this.props.setTimerSliderVisibility() }}>
+                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, 'timer')}>
                                     <MaterialIcons
                                         name='timer'
                                         size={32}
@@ -152,19 +180,30 @@ class TopToolbar extends React.Component {
                                     </CameraText>
                                 </TouchableOpacity>
                             </View>
+                            <View style={styles.topToolbarButtons}>
+                                <TouchableOpacity
+                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, 'photos')}>
+                                    <MaterialIcons
+                                        name='photo-library'
+                                        size={32}
+                                        color='white' />
+                                    <CameraText style={{
+                                        alignSelf: 'center',
+                                        marginLeft: 5,
+                                    }}>
+                                        {`${this.props.shotsToTake}`}
+                                    </CameraText>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                     <View style={styles.sliderView}>
-                        {this.props.timerSliderVisibility ?
+                        {this.props.settingsSliderVisibility ?
                             (<Slider
-                                minimumValue={shotstInervalMin}
-                                maximumValue={shotsIntervalMax}
-                                step={shotsIntervalStep}
-                                value={this.props.shotsInterval}
+                                {...sliderProps}
                                 thumbTintColor='#fff'
                                 minimumTrackTintColor='#fff'
                                 maximumTrackTintColor='#ccc'
-                                onValueChange={this.props.setShotsInterval}
                             />) :
                             null}
                     </View>
@@ -197,17 +236,33 @@ export default class CameraScreen extends React.Component {
         hasCameraRollPermissions: null,
         type: Camera.Constants.Type.back,
         flashMode: Camera.Constants.FlashMode.off,
-        shotsInterval: shotsDefaultInterval,
-        timerSliderVisibility: false,
+        shotsInterval: shotsIntervalDefault,
+        settingsSliderVisibility: false,
+        settingsSliderType: 'timer'
     };
 
-    setTimerSliderVisibility = (visibility, a) => {
+    setSettingsSliderState = (visibility, type, a) => {
         if (visibility === undefined) {
-            this.setState((prevState) =>
-                ({ timerSliderVisibility: !prevState.timerSliderVisibility }));
+            // note that short-circuiting with `<expression> && { prop: val }`
+            // does not work in react native - the result MUST be an object,
+            // otherwise exception is thrown
+            this.setState((prevState) => ({
+                ...((type === prevState.settingsSliderType
+                    || (type != prevState.settingsSliderType && !prevState.settingsSliderVisibility)) ?
+                    { settingsSliderVisibility: !prevState.settingsSliderVisibility }
+                    :
+                    {}),
+                ...(type ?
+                    { settingsSliderType: type }
+                    :
+                    {})
+            }));
         }
         else {
-            this.setState({ timerSliderVisibility: visibility });
+            this.setState({
+                settingsSliderVisibility: visibility,
+                ...(type && { settingsSliderType: type })
+            });
         }
     }
 
@@ -345,7 +400,7 @@ export default class CameraScreen extends React.Component {
                         Camera component itself. */}
                     <TouchableWithoutFeedback
                         onPress={() => {
-                            this.setTimerSliderVisibility(false);
+                            this.setSettingsSliderState(false);
                         }}>
                         <View
                             style={{
@@ -369,11 +424,14 @@ export default class CameraScreen extends React.Component {
                                             type={this.state.type}
                                             flashMode={this.state.flashMode}
                                             shotsInterval={this.state.shotsInterval}
-                                            timerSliderVisibility={this.state.timerSliderVisibility}
+                                            shotsToTake={this.props.shotsToTake}
+                                            settingsSliderVisibility={this.state.settingsSliderVisibility}
+                                            settingsSliderType={this.state.settingsSliderType}
                                             flipCamera={this.flipCamera}
                                             toggleFlashMode={this.toggleFlashMode}
                                             setShotsInterval={this.setShotsInterval}
-                                            setTimerSliderVisibility={this.setTimerSliderVisibility}>
+                                            setShotsToTake={this.props.setShotsToTake}
+                                            setSettingsSliderState={this.setSettingsSliderState}>
                                         </TopToolbar>}
                                     <BottomToolbar startShootingSession={this.startShootingSession}>
                                     </BottomToolbar>
