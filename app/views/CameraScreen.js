@@ -28,7 +28,7 @@ import {
 } from '../config';
 
 import CameraText from '../components/CameraText';
-import CameraHeader from '../components/CameraHeader';
+import CameraHeaderText from '../components/CameraHeaderText';
 import Loader from '../components/Loader';
 
 const styles = StyleSheet.create({
@@ -91,9 +91,9 @@ class Shots extends React.Component {
     render() {
         return (
             <View style={styles.shotsView}>
-                <CameraHeader>
+                <CameraHeaderText>
                     {`${this.props.shotsTaken}/${this.props.shotsToTake}`}
-                </CameraHeader>
+                </CameraHeaderText>
             </View>
         );
     }

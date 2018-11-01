@@ -3,11 +3,15 @@ import { Text } from 'react-native';
 
 import CameraText from './CameraText';
 
-export default class CameraHeader extends React.Component {
+export default class CameraHeaderText extends React.Component {
     render() {
         return (
-            <CameraText>
-                <Text style={{ fontSize: 38 }}>
+            <CameraText
+                style={{
+                    ...this.props.style,
+                }}>
+                <Text
+                    style={{ fontSize: 38 }}>
                     {this.props.children}
                 </Text>
             </CameraText>
