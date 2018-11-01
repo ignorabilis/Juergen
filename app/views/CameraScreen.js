@@ -85,6 +85,8 @@ const styles = StyleSheet.create({
     }
 });
 
+var SettingsSliderTypes = Object.freeze({ "timer": 1, "photos": 2 })
+
 class Shots extends React.Component {
     render() {
         return (
@@ -118,7 +120,7 @@ class TopToolbar extends React.Component {
 
         let sliderProps;
         switch (this.props.settingsSliderType) {
-            case 'timer':
+            case SettingsSliderTypes.timer:
                 sliderProps = {
                     minimumValue: shotsInervalMin,
                     maximumValue: shotsIntervalMax,
@@ -128,7 +130,7 @@ class TopToolbar extends React.Component {
                 };
                 break;
 
-            case 'photos':
+            case SettingsSliderTypes.photos:
                 sliderProps = {
                     minimumValue: shotsToTakeMin,
                     maximumValue: shotsToTakeMax,
@@ -167,7 +169,7 @@ class TopToolbar extends React.Component {
                             </TouchableOpacity>
                             <View style={styles.topToolbarButtons}>
                                 <TouchableOpacity
-                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, 'timer')}>
+                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, SettingsSliderTypes.timer)}>
                                     <MaterialIcons
                                         name='timer'
                                         size={32}
@@ -182,7 +184,7 @@ class TopToolbar extends React.Component {
                             </View>
                             <View style={styles.topToolbarButtons}>
                                 <TouchableOpacity
-                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, 'photos')}>
+                                    onPress={this.props.setSettingsSliderState.bind(this, undefined, SettingsSliderTypes.photos)}>
                                     <MaterialIcons
                                         name='photo-library'
                                         size={32}
@@ -238,7 +240,7 @@ export default class CameraScreen extends React.Component {
         flashMode: Camera.Constants.FlashMode.off,
         shotsInterval: shotsIntervalDefault,
         settingsSliderVisibility: false,
-        settingsSliderType: 'timer'
+        settingsSliderType: SettingsSliderTypes.timer
     };
 
     setSettingsSliderState = (visibility, type, a) => {
