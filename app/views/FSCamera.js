@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, BackHandler } from 'react-native';
-import { shotsToTakeDefault } from '../config';
+import { shotsToTakeDefault, UserSettings } from '../config';
 
 import CameraScreen from './CameraScreen';
 import CameraRollScreen from './CameraRollScreen';
@@ -18,7 +18,7 @@ export default class FSCamera extends React.Component {
   };
 
   setShotsToTake = async (shotsToTake) => {
-    setItem('shotsToTake', shotsToTake);
+    setItem(UserSettings.shotsToTake, shotsToTake);
     this.setState({ shotsToTake: shotsToTake })
   }
 
@@ -69,7 +69,7 @@ export default class FSCamera extends React.Component {
   async componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 
-    const shotsToTake = await getItem('shotsToTake');
+    const shotsToTake = await getItem(UserSettings.shotsToTake);
 
     this.setState({
       ...(shotsToTake != null ? { shotsToTake } : {})

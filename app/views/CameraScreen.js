@@ -22,7 +22,9 @@ import {
     shotsToTakeDefault,
     shotsToTakeMin,
     shotsToTakeMax,
-    shotsToTakeStep
+    shotsToTakeStep,
+    SettingsSliderTypes,
+    UserSettings
 } from '../config';
 import { getItem, setItem } from '../helpers/Storage'
 
@@ -83,8 +85,6 @@ const styles = StyleSheet.create({
         paddingRight: 10
     }
 });
-
-var SettingsSliderTypes = Object.freeze({ "timer": 1, "photos": 2 })
 
 class Shots extends React.Component {
     render() {
@@ -262,7 +262,10 @@ export default class CameraScreen extends React.Component {
         else {
             this.setState({
                 settingsSliderVisibility: visibility,
-                ...(type && { settingsSliderType: type })
+                ...(type ?
+                    { settingsSliderType: type }
+                    :
+                    {})
             });
         }
     }
@@ -332,7 +335,7 @@ export default class CameraScreen extends React.Component {
                     :
                     Camera.Constants.Type.back
 
-            setItem('cameraType', type);
+            setItem(UserSettings.cameraType, type);
             return { type };
         });
     }
@@ -350,13 +353,13 @@ export default class CameraScreen extends React.Component {
                     break;
             }
 
-            setItem('flashMode', flashMode);
+            setItem(UserSettings.flashMode, flashMode);
             return { flashMode };
         });
     }
 
     setShotsInterval = (shotsInterval) => {
-        setItem('shotsInterval', shotsInterval);
+        setItem(UserSettings.shotsInerval, shotsInterval);
         this.setState({ shotsInterval });
     }
 
@@ -374,9 +377,9 @@ export default class CameraScreen extends React.Component {
     }
 
     async componentDidMount() {
-        const type = await getItem('cameraType');
-        const flashMode = await getItem('flashMode');
-        const shotsInterval = await getItem('shotsInterval');
+        const type = await getItem(UserSettings.cameraType);
+        const flashMode = await getItem(UserSettings.flashMode);
+        const shotsInterval = await getItem(UserSettings.shotsInerval);
 
         this.setState({
             ...(type != null ? { type } : {}),

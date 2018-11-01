@@ -7,3 +7,15 @@ export const shotsToTakeDefault = 10,
     shotsInervalMin = 300,
     shotsIntervalMax = 2000,
     shotsIntervalStep = 100;
+
+export const SettingsSliderTypes = Object.freeze({
+    timer: 1,
+    photos: 2
+});
+
+export const UserSettings = Object.freeze({
+    shotsToTake: 'shotsToTake',
+    shotsInerval: 'shotsInerval',
+    cameraType: 'cameraType',
+    flashMode: 'flashMode'
+});
