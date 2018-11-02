@@ -104,8 +104,6 @@ class TopToolbar extends React.Component {
             'rear' :
             'front';
 
-        // Camera.Constants.FlashMode.torch is used instead of
-        // Camera.Constants.FlashMode.on - see below for details
         let flashModeName = 'off';
         switch (this.props.flashMode) {
             case Camera.Constants.FlashMode.off:
@@ -236,7 +234,18 @@ export default class CameraScreen extends React.Component {
         hasCameraPermission: null,
         hasCameraRollPermissions: null,
         cameraType: Camera.Constants.Type.back,
+
+        // Use Camera.Constants.FlashMode.torch instead of 
+        // Camera.Constants.FlashMode.auto or Camera.Constants.FlashMode.on
+        // because the flash cannot keep up when taking shots fast;
+        // while preparing for a shooting session the flash should be turned off;
+        // once shooting begins the user value is taken from `flashMode` - 
+        // it could be torch - and is set to `shootingFlashMode`;
+        // once shooting ends `shootingFlashMode` is set to
+        // Camera.Constants.FlashMode.off
         flashMode: Camera.Constants.FlashMode.off,
+        shootingFlashMode: Camera.Constants.FlashMode.off,
+
         shotsInterval: shotsIntervalDefault,
         settingsSliderVisibility: false,
         settingsSliderType: SettingsSliderTypes.timer
@@ -276,6 +285,9 @@ export default class CameraScreen extends React.Component {
     }
 
     stopShootingSession = (reason) => {
+        // turn off the flash on session end
+        this.setState({ shootingFlashMode: Camera.Constants.FlashMode.off });
+
         clearInterval(this._interval);
         this._interval = null;
 
@@ -314,7 +326,13 @@ export default class CameraScreen extends React.Component {
                 // then the rest are taken after 1.5 seconds
                 // setTimeout seems to be worse, although this.shoot 
                 // takes less than 2ms to fire; view ## Timing in README for details
-                this.shoot();
+
+                this.setState((prevState) => ({ shootingFlashMode: prevState.flashMode }));
+
+                // firing immediately is not the best option, 
+                // especially when the flash needs to be turned on before that
+                // this.shoot();
+
                 this._interval = setInterval(() => {
                     if (this.props.shotsTaken === this.props.shotsToTake) {
                         this.stopShootingSession('all shots taken');
@@ -406,11 +424,7 @@ export default class CameraScreen extends React.Component {
                         ref={ref => { this.camera = ref; }}
                         style={{ flex: 1 }}
                         type={this.state.cameraType}
-                        // Use Camera.Constants.FlashMode.torch instead of Camera.Constants.FlashMode.auto
-                        // since when taking shots fast the flash cannot keep up;
-                        // while preparing the flash should be turned off;
-                        // once the shooting begins take the real value (which could be torch)
-                        flashMode={this._interval ? this.state.flashMode : Camera.Constants.FlashMode.off}
+                        flashMode={this.state.shootingFlashMode}
                         // The ratio will match the dimensions of the view you place the Camera component in.
                         // So to set it to the device screen just use 16:9
                         // !iOS - this setting is ignored, it should work out-of-the-box
