@@ -6,13 +6,19 @@ import CameraText from '../components/CameraText';
 
 import * as math from '../../utils/math'
 
-const randLoadingHeaders = ['Here they come!',
+const randLoadingHeaders = [
+    'Here they come!',
     'Excited?',
     'Some magic coming!',
     'Cool!',
-    'Got them. What\'s next?'];
+    'Got them. What\'s next?'
+];
 
 export default class Loader extends React.Component {
+    state = {
+        loadingHeader: randLoadingHeaders[math.randInt(0, randLoadingHeaders.length - 1)]
+    }
+
     spinValue = new Animated.Value(0);
     spin = this.spinValue.interpolate({
         inputRange: [0, 1],
@@ -35,7 +41,11 @@ export default class Loader extends React.Component {
 
     render() {
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
                 <Animated.View style={{
                     width: 48,
                     height: 48,
@@ -46,7 +56,9 @@ export default class Loader extends React.Component {
                         size={48}
                         color='white' />
                 </Animated.View>
-                <CameraText>{randLoadingHeaders[math.randInt(0, randLoadingHeaders.length - 1)]}</CameraText>
+                <CameraText>
+                    {this.state.loadingHeader}
+                </CameraText>
             </View>
         );
     }
