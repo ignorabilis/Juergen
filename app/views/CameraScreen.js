@@ -70,9 +70,8 @@ const styles = StyleSheet.create({
     innerShutterButton: {
         width: 80,
         height: 80,
+        backgroundColor: 'white',
         borderRadius: 40,
-        borderColor: 'white',
-        borderWidth: 2,
         alignSelf: 'center',
     },
 
@@ -216,13 +215,14 @@ class BottomToolbar extends React.Component {
     render() {
         return (
             <View style={styles.toolbars}>
-                <TouchableOpacity
-                    style={styles.shutterToolbar}
-                    onPress={this.props.startShootingSession}>
-                    <View style={styles.outerShutterButton}>
-                        <View style={styles.innerShutterButton}></View>
-                    </View>
-                </TouchableOpacity>
+                <View style={styles.shutterToolbar}>
+                    <TouchableOpacity
+                        onPress={this.props.startShootingSession}>
+                        <View style={styles.outerShutterButton}>
+                            <View style={styles.innerShutterButton}></View>
+                        </View>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
