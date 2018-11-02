@@ -248,7 +248,15 @@ export default class CameraScreen extends React.Component {
 
         shotsInterval: shotsIntervalDefault,
         settingsSliderVisibility: false,
-        settingsSliderType: SettingsSliderTypes.timer
+        settingsSliderType: SettingsSliderTypes.timer,
+
+        // Avoid rendering flicker.
+        // User settings from storage might benefit if passed as props,
+        // but icons still seem to load after the first render.
+        // Additionally the camera is not available immediately
+        // so for now until `componentDidMount` just render
+        // a static black screen
+        ready: false
     };
 
     setSettingsSliderState = (visibility, sliderType) => {
@@ -400,6 +408,7 @@ export default class CameraScreen extends React.Component {
         const shotsInterval = await getItem(UserSettings.shotsInerval);
 
         this.setState({
+            ready: true,
             ...(cameraType != null ? { cameraType } : {}),
             ...(flashMode != null ? { flashMode } : {}),
             ...(shotsInterval != null ? { shotsInterval } : {})
@@ -418,64 +427,69 @@ export default class CameraScreen extends React.Component {
             return <View />;
         } else if (hasCameraPermission && hasCameraRollPermissions) {
             return (
-                <View style={{ flex: 1 }}>
-                    <StatusBar hidden={true} />
-                    <Camera
-                        ref={ref => { this.camera = ref; }}
-                        style={{ flex: 1 }}
-                        type={this.state.cameraType}
-                        flashMode={this.state.shootingFlashMode}
-                        // The ratio will match the dimensions of the view you place the Camera component in.
-                        // So to set it to the device screen just use 16:9
-                        // !iOS - this setting is ignored, it should work out-of-the-box
-                        ratio={'16:9'}>
-                    </Camera>
-                    {/* This below - position: 'absolute' - looks ugly, but is needed:
+                !this.state.ready ?
+                    <View style={{ flex: 1, backgroundColor: 'black' }}>
+                    </View>
+                    :
+                    <View style={{ flex: 1 }}>
+                        <StatusBar hidden={true} />
+                        <Camera
+                            ref={ref => { this.camera = ref; }}
+                            style={{ flex: 1 }}
+                            type={this.state.cameraType}
+                            flashMode={this.state.shootingFlashMode}
+                            // The ratio will match the dimensions of the view you place the Camera component in.
+                            // So to set it to the device screen just use 16:9
+                            // !iOS - this setting is ignored, it should work out-of-the-box
+                            ratio={'16:9'}>
+                        </Camera>
+                        {/* This below - position: 'absolute' - looks ugly, but is needed:
                         conditional rendering inside the camera breakes the camera.
                         The first time TopToolbar changes to Shots the camera turns black
                         and no photos are taken. This seems to be an issue with the 
                         Camera component itself. */}
-                    <TouchableWithoutFeedback
-                        onPress={() => {
-                            this.setSettingsSliderState(false);
-                        }}>
-                        <View
-                            style={{
-                                position: 'absolute',
-                                top: 0, bottom: 0,
-                                left: 0, right: 0
+                        {/* TODO - probably move this to a separate component - CameraOverlay*/}
+                        <TouchableWithoutFeedback
+                            onPress={() => {
+                                this.setSettingsSliderState(false);
                             }}>
-                            {this.props.loading
-                                ?
-                                <Loader></Loader>
-                                :
-                                <View style={{ flex: 1 }}>
-                                    {this._interval
-                                        ?
-                                        <Shots
-                                            shotsTaken={this.props.shotsTaken}
-                                            shotsToTake={this.props.shotsToTake}>
-                                        </Shots>
-                                        :
-                                        <TopToolbar
-                                            cameraType={this.state.cameraType}
-                                            flashMode={this.state.flashMode}
-                                            shotsInterval={this.state.shotsInterval}
-                                            shotsToTake={this.props.shotsToTake}
-                                            settingsSliderVisibility={this.state.settingsSliderVisibility}
-                                            settingsSliderType={this.state.settingsSliderType}
-                                            flipCamera={this.flipCamera}
-                                            toggleFlashMode={this.toggleFlashMode}
-                                            setShotsInterval={this.setShotsInterval}
-                                            setShotsToTake={this.props.setShotsToTake}
-                                            setSettingsSliderState={this.setSettingsSliderState}>
-                                        </TopToolbar>}
-                                    <BottomToolbar startShootingSession={this.startShootingSession}>
-                                    </BottomToolbar>
-                                </View>}
-                        </View>
-                    </TouchableWithoutFeedback>
-                </View>
+                            <View
+                                style={{
+                                    position: 'absolute',
+                                    top: 0, bottom: 0,
+                                    left: 0, right: 0
+                                }}>
+                                {this.props.loading
+                                    ?
+                                    <Loader></Loader>
+                                    :
+                                    <View style={{ flex: 1 }}>
+                                        {this._interval
+                                            ?
+                                            <Shots
+                                                shotsTaken={this.props.shotsTaken}
+                                                shotsToTake={this.props.shotsToTake}>
+                                            </Shots>
+                                            :
+                                            <TopToolbar
+                                                cameraType={this.state.cameraType}
+                                                flashMode={this.state.flashMode}
+                                                shotsInterval={this.state.shotsInterval}
+                                                shotsToTake={this.props.shotsToTake}
+                                                settingsSliderVisibility={this.state.settingsSliderVisibility}
+                                                settingsSliderType={this.state.settingsSliderType}
+                                                flipCamera={this.flipCamera}
+                                                toggleFlashMode={this.toggleFlashMode}
+                                                setShotsInterval={this.setShotsInterval}
+                                                setShotsToTake={this.props.setShotsToTake}
+                                                setSettingsSliderState={this.setSettingsSliderState}>
+                                            </TopToolbar>}
+                                        <BottomToolbar startShootingSession={this.startShootingSession}>
+                                        </BottomToolbar>
+                                    </View>}
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
             );
         } else {
             return <Text>No access to camera or camera roll!</Text>;
