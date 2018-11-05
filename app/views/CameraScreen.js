@@ -299,8 +299,11 @@ export default class CameraScreen extends React.Component {
         clearInterval(this._interval);
         this._interval = null;
 
-        this.props.setLoading(true);
-        setTimeout(this.toggleCamera, 500);
+        if (this.props.shotsTaken > 0) {
+            this.props.setLoading(true);
+            setTimeout(this.toggleCamera, 500);
+        }
+
         console.log(`taking shots stopped for reason: ${reason}`);
     }
 
