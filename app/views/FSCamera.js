@@ -101,18 +101,19 @@ export default class FSCamera extends React.Component {
                         toggleCamera={this.toggleCamera}
                         setLoading={this.setLoading}></CameraScreen>
                 </View>
-                <View
-                    // ~~ is used to convert true/false to 1/0
-                    style={{
-                        flex: ~~!this.state.showCamera,
-                    }}>
-                    <CameraRollScreen
-                        shotsUris={this.state.shotsUris}
-                        resetShots={this.resetShots}
-                        toggleCamera={this.toggleCamera}
-                        keepShot={this.keepShot}>
-                    </CameraRollScreen>
-                </View>
+                {
+                    this.state.showCamera ?
+                        <View style={{ flex: 0 }}></View>
+                        :
+                        <View style={{ flex: 1 }}>
+                            <CameraRollScreen
+                                shotsUris={this.state.shotsUris}
+                                resetShots={this.resetShots}
+                                toggleCamera={this.toggleCamera}
+                                keepShot={this.keepShot}>
+                            </CameraRollScreen>
+                        </View>
+                }
             </View>
         );
     }
