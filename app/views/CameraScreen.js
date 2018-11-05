@@ -8,7 +8,7 @@ import {
     TouchableWithoutFeedback,
     Alert,
 } from 'react-native';
-import { Camera, Permissions } from 'expo';
+import { Camera, Permissions, AppLoading } from 'expo';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import Slider from 'react-native-slider';
@@ -431,8 +431,7 @@ export default class CameraScreen extends React.Component {
         } else if (hasCameraPermission && hasCameraRollPermissions) {
             return (
                 !this.state.ready ?
-                    <View style={{ flex: 1, backgroundColor: 'black' }}>
-                    </View>
+                    <AppLoading />
                     :
                     <View style={{ flex: 1 }}>
                         <StatusBar hidden={true} />
