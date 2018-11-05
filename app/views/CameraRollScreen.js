@@ -2,15 +2,13 @@ import React from 'react';
 import {
     StatusBar,
     CameraRoll,
-    Image,
     ImageBackground,
     Text,
     View,
-    ScrollView,
     StyleSheet,
     TouchableHighlight,
+    TouchableOpacity,
     TouchableWithoutFeedback,
-    Dimensions,
     Alert
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,67 +19,63 @@ import * as alerts from '../helpers/Alerts';
 import to from '../../utils/to';
 
 const styles = StyleSheet.create({
-    contentText: { color: '#fff' },
-    saveToolbar: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
+    contentText: { color: '#FFF' },
 
-    saveButton: {
-        margin: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 24,
-    },
-    pagesToolbar: {
-        paddingHorizontal: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 2,
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
     topSection: {
-        height: 80,
         justifyContent: 'center',
         alignItems: 'flex-end',
-        paddingHorizontal: 20,
-        backgroundColor: 'rgba(52, 52, 52, 0.6)'
+        padding: 20
     },
     bottomSection: {
-        height: 150,
-        marginTop: -150,
-        backgroundColor: 'rgba(52, 52, 52, 0.6)'
+        position: 'absolute',
+        padding: 10,
+        bottom: 0,
+        left: 0,
+        right: 0
     },
-    buttonsText: {
-        fontSize: 14,
-        color: 'black',
+
+    saveToolbar: {
+        flex: 0,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
     },
-    imageButton: {
+    pagesToolbar: {
+        flex: 0,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+
+    saveButtons: {
+        margin: 8,
+        marginRight: 24
+    },
+    pageButtons: {
         margin: 3,
         width: 20,
         height: 20,
         opacity: 0.9,
         alignItems: 'center',
-        justifyContent: 'center',
-
         backgroundColor: 'white',
         marginRight: 5,
         borderRadius: 10
     },
-    buttonSelected: {
+    pageButtonsText: {
+        fontSize: 14,
+        color: 'black',
+    },
+    pageButtonSelected: {
         opacity: 1,
-        backgroundColor: '#CCC',
+        backgroundColor: '#BBB',
     },
-    customSlide: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+
     customImage: {
-        flex: 1,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        right: 0,
+        left: 0,
         alignSelf: 'stretch',
         width: undefined,
         height: undefined,
@@ -141,10 +135,7 @@ class KeepImageSlider extends React.Component {
                             // It's important to put style here because it's got offset inside
                             <View
                                 key={index}
-                                style={[
-                                    style,
-                                    styles.customSlide,
-                                ]}>
+                                style={[style]}>
                                 <ImageBackground
                                     source={{ uri: shotUri }}
                                     style={styles.customImage}
@@ -165,33 +156,30 @@ class KeepImageSlider extends React.Component {
                     customButtons={(position, move) => (
                         <View style={[styles.bottomSection]}>
                             <View style={styles.saveToolbar}>
-                                <TouchableHighlight
-                                    style={[styles.saveButton]}
-                                    underlayColor="#CCC"
+                                <TouchableOpacity
+                                    style={[styles.saveButtons]}
                                     onPress={this.keepShots.bind(this, false)}>
                                     <MaterialCommunityIcons
                                         name={`content-save`}
                                         size={40}
                                         color='white' />
-                                </TouchableHighlight>
-                                <TouchableHighlight
-                                    style={[styles.saveButton]}
-                                    underlayColor="#CCC"
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.saveButtons]}
                                     onPress={this.keepShots.bind(this, true)}>
                                     <MaterialCommunityIcons
                                         name={`content-save-all`}
                                         size={40}
                                         color='white' />
-                                </TouchableHighlight>
-                                <TouchableHighlight
-                                    style={[styles.saveButton]}
-                                    underlayColor="#CCC"
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.saveButtons]}
                                     onPress={this.cancelShots}>
                                     <MaterialCommunityIcons
                                         name={`cancel`}
                                         size={40}
                                         color='white' />
-                                </TouchableHighlight>
+                                </TouchableOpacity>
                             </View>
                             <View style={styles.pagesToolbar}>
                                 {
@@ -200,9 +188,9 @@ class KeepImageSlider extends React.Component {
                                             <TouchableHighlight
                                                 key={index}
                                                 onPress={() => move(index)}
-                                                style={[styles.imageButton, position === index && styles.buttonSelected]}
+                                                style={[styles.pageButtons, position === index && styles.pageButtonSelected]}
                                                 underlayColor="#CCC">
-                                                <Text style={[styles.buttonsText]}>
+                                                <Text style={[styles.pageButtonsText]}>
                                                     {index + 1}
                                                 </Text>
                                             </TouchableHighlight>
