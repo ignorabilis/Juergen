@@ -315,7 +315,7 @@ export default class CameraScreen extends React.Component {
                 this.props.addShotUri(data.uri);
             })
             .catch(err => {
-                console.log(`Camera error: ${err}`);
+                console.error(`Camera error: ${err}`);
                 Alert.alert('Something happened, camera cannot take photo.');
             });
 

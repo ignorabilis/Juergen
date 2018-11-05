@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
 async function saveShotToCameraRoll(shotUri) {
     const [_, err] = await to(CameraRoll.saveToCameraRoll(shotUri, 'photo'));
     if (err) {
-        console.log(`Camera Roll error: ${err}`);
+        console.error(`Camera Roll error: ${err}`);
         Alert.alert('Something happened, cannot save to camera roll.');
     }
 }
