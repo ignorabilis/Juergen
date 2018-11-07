@@ -6,7 +6,7 @@ import {
 
 import Expo from 'expo';
 
-import FSCamera from './app/views/FSCamera';
+import CameraRoot from './app/views/CameraRoot';
 
 // ignore warnings about remote debugger while... developing
 YellowBox.ignoreWarnings(['Remote debugger']);
@@ -22,7 +22,7 @@ export default class App extends React.Component {
     return (
       <View
         style={{ flex: 1 }}>
-        <FSCamera></FSCamera>
+        <CameraRoot></CameraRoot>
       </View>
     );
   }

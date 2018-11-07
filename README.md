@@ -1,4 +1,4 @@
-# FSCamera
+# Juergen
 
 A camera for taking series of photos very fast
 

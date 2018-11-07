@@ -8,7 +8,7 @@ import CameraRollScreen from './CameraRollScreen';
 import * as alerts from '../helpers/Alerts';
 import { getItem, setItem } from '../helpers/Storage'
 
-export default class FSCamera extends React.Component {
+export default class CameraRoot extends React.Component {
     state = {
         shotsTaken: 0,
         shotsToTake: shotsToTakeDefault,
