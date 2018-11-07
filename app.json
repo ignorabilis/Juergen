@@ -11,7 +11,6 @@
     ],
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/camera-icon.png",
     "splash": {
       "image": "./assets/camera.png",
       "resizeMode": "contain",
@@ -25,10 +24,12 @@
     ],
     "ios": {
       "bundleIdentifier": "nyc.lumberdev.juergen",
+      "icon": "./assets/camera-icon-ios.png",
       "supportsTablet": true
     },
     "android": {
       "package": "nyc.lumberdev.juergen",
+      "icon": "./assets/camera-icon-android.png",
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
