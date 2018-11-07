@@ -24,9 +24,11 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "nyc.lumberdev.juergen",
       "supportsTablet": true
     },
     "android": {
+      "package": "nyc.lumberdev.juergen",
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
